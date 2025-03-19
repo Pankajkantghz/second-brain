@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "../.."
+		},
+		{
+			"path": "../../../Second_Brain_App"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "FrontEnd_Brain_App"
+	}
+}

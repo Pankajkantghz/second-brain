@@ -1,68 +1,154 @@
-import { useEffect, useState } from 'react';
-import { Sidebar } from '../components/Sidebar';
-import CreateContentModel from '../components/CreateContentModel';
-import { Button } from '../components/Button';
-import Card from '../components/Card';
-import PlusIcon from '../icons/PlusIcon';
-import ShareIcon from '../icons/ShareIcon';
-import useContent from '../hooks/useContent';
-import { Backend_URL } from '../config';
-import axios from 'axios';
+import { useEffect, useState } from "react";
+
+import axios from "axios";
+import { toast } from "react-toastify";
+
+import { Sidebar } from "../components/Sidebar";
+
+import CreateContentModel from "../components/CreateContentModel";
+
+import EditContentModal from "../components/EditContentModal";
+
+import DashboardHeader from "../components/dashboard/DashboardHeader";
+
+import DashboardStats from "../components/dashboard/DashboardStats";
+
+import ContentGrid from "../components/dashboard/ContentGrid";
+
+import EmptyState from "../components/dashboard/EmptyState";
+
+import useContent from "../hooks/useContent";
+
+import { Backend_URL } from "../config";
 
 const DashBoard = () => {
-    const [modalOpen, setModalOpen] = useState(false);
-    const { contents, refresh } = useContent(); // Use contents, not content
+  const [modalOpen, setModalOpen] = useState(false);
 
-    useEffect(() => {
-        refresh();
-    }, [modalOpen]);
+  const [editOpen, setEditOpen] = useState(false);
 
-    const handleShare = async () => {
-        try {
-            const response = await axios.post(`${Backend_URL}/api/v1/brain/share`, {
-                share: true,
-            }, {
-                headers: { 
-                    "Authorization": localStorage.getItem("token")
-                },
-            });
-            const shareUrl = `http://localhost:5173/share/${response.data.hash}`;
-            alert(`Shared URL: ${shareUrl}`); // Display the URL in an alert
-        } catch (error) {
-            console.error('Error sharing brain:', error);
-        }
-    };
+  const [selectedContent, setSelectedContent] = useState({
+    id: "",
+    title: "",
+  });
 
-    return (
-        <div>
-            <Sidebar />
+  const { contents, refresh } = useContent();
 
-            <div className='p-4 ml-72 min-h-screen bg-gray-100 border-2'>
-                <CreateContentModel open={modalOpen} onClose={() => setModalOpen(false)} />
+  useEffect(() => {
+    refresh();
+  }, [modalOpen]);
 
-                <div className="flex justify-end gap-2">
-                    <Button
-                        onClick={() => setModalOpen(true)}
-                        variant="primary"
-                        text="Add Content"
-                        startIcon={<PlusIcon />}
-                    />
-                    <Button
-                        onClick={handleShare}
-                        variant="secondary"
-                        text="Share Brain"
-                        startIcon={<ShareIcon />}
-                    />
-                </div>
+  const youtubeCount = contents.filter(
+    (item) => item.type === "Youtube",
+  ).length;
 
-                <div className="flex gap-4 flex-wrap">
-                    {contents.map(({ link, type, title }) => (
-                        <Card key={link} type={type} link={link} title={title} />
-                    ))}
-                </div>
-            </div>
+  const twitterCount = contents.filter(
+    (item) => item.type === "Twitter",
+  ).length;
+
+  const handleShare = async () => {
+    try {
+      const response = await axios.post(
+        `${Backend_URL}/api/v1/brain/share`,
+        {
+          share: true,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
+      );
+
+      const shareUrl = `http://localhost:5173/share/${response.data.hash}`;
+
+      await navigator.clipboard.writeText(shareUrl);
+
+      toast.success("Brain link copied");
+    } catch {
+      toast.error("Failed to share brain");
+    }
+  };
+
+  const handleDelete = async (contentId: string) => {
+    try {
+      await axios.delete(`${Backend_URL}/api/v1/content`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+
+        data: {
+          contentId,
+        },
+      });
+
+      toast.success("Content deleted");
+
+      refresh();
+    } catch {
+      toast.error("Delete failed");
+    }
+  };
+
+  const handleEdit = (id: string, title: string) => {
+    setSelectedContent({
+      id,
+      title,
+    });
+
+    setEditOpen(true);
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <Sidebar />
+
+      <CreateContentModel
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+      />
+
+      <EditContentModal
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        contentId={selectedContent.id}
+        currentTitle={selectedContent.title}
+        refresh={refresh}
+      />
+
+      <main className="ml-72 min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-purple-50 p-8">
+        <DashboardHeader
+          onAdd={() => setModalOpen(true)}
+          onShare={handleShare}
+        />
+
+        <DashboardStats
+          total={contents.length}
+          youtubeCount={youtubeCount}
+          twitterCount={twitterCount}
+        />
+
+        <div className="mb-5">
+          <h2 className="text-2xl font-semibold text-slate-800">
+            Saved Content
+          </h2>
+
+          <p className="mt-1 text-slate-500">
+            Your stored knowledge and resources.
+          </p>
         </div>
-    );
+
+        {contents.length > 0 ? (
+          <ContentGrid
+            contents={contents}
+            onDelete={handleDelete}
+            onEdit={handleEdit}
+          />
+        ) : (
+          <EmptyState onAdd={() => setModalOpen(true)} />
+        )}
+      </main>
+    </div>
+  );
 };
 
 export default DashBoard;

@@ -1,18 +1,20 @@
 import { ReactElement } from "react";
 
-
-export default function SidebarItems({text, icon}:{text:string,
-    icon: ReactElement}) {
-    
-  return (
-    <div className="flex text-gray-700 py-2 cursor-pointer hover:bg-gray-200 rounded max-w-48 pl-4 transition-all duration-500">
-        <div className="pr-2">
-        {icon}
-        </div>
-        <div >
-        {text} 
-        </div>
-        </div>
-  )
+interface SidebarItemsProps {
+  text: string;
+  icon: ReactElement;
 }
 
+export default function SidebarItems({ text, icon }: SidebarItemsProps) {
+  return (
+    <button className="group flex w-full items-center gap-4 rounded-2xl px-4 py-3 text-slate-700 transition-all duration-200 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 hover:text-indigo-600 hover:shadow-sm">
+      {/* Icon */}
+      <div className="text-slate-500 transition-colors duration-200 group-hover:text-indigo-600">
+        {icon}
+      </div>
+
+      {/* Text */}
+      <span className="font-medium text-base">{text}</span>
+    </button>
+  );
+}

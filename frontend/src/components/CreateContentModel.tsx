@@ -1,110 +1,155 @@
+import { useRef, useState } from "react";
+import axios from "axios";
 
 import CrossIcon from "../icons/CrossIcon";
 import Input from "./Input";
 import { Button } from "./Button";
-import { useRef, useState } from "react";
 import { Backend_URL } from "../config";
-import axios from "axios";
+
 enum ContentType {
-    Youtube = "Youtube",
-    Twitter = "Twitter",  
-  }
-  
-export default function CreateContentModel({ open, onClose }) {
+  Youtube = "Youtube",
+  Twitter = "Twitter",
+}
 
-    const titleRef = useRef<HTMLInputElement>(null);
-    const linkRef = useRef<HTMLInputElement>(null);
-    
-    const [type, setType] = useState(ContentType.Youtube);
+interface CreateContentModelProps {
+  open: boolean;
+  onClose: () => void;
+}
 
-    async function addContent() {
-        const title = titleRef.current?.value;
-        const link = linkRef.current?.value;
+export default function CreateContentModel({
+  open,
+  onClose,
+}: CreateContentModelProps) {
+  const titleRef = useRef<HTMLInputElement>(null);
+  const linkRef = useRef<HTMLInputElement>(null);
 
-        await axios.post(`${Backend_URL}/api/v1/content`, {
-            link,
-            title,
-            type
-        }, {
-            headers: {
-                "Authorization": localStorage.getItem("token")
-            }
+  const [type, setType] = useState(ContentType.Youtube);
 
-        })
-        onClose();
+  const [loading, setLoading] = useState(false);
 
+  async function addContent() {
+    try {
+      setLoading(true);
+
+      const title = titleRef.current?.value;
+      const link = linkRef.current?.value;
+
+      await axios.post(
+        `${Backend_URL}/api/v1/content`,
+        {
+          title,
+          link,
+          type,
+        },
+        {
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
+        },
+      );
+
+      onClose();
+    } catch (error) {
+      console.error(error);
+      alert("Failed to add content");
+    } finally {
+      setLoading(false);
     }
-    // 
-    return (
-        <div>
-            {open && (<div>
-                <div className="w-screen h-screen bg-slate-500 fixed top-0 left-0 opacity-60 flex justify-center">
+  }
 
-                </div>
+  if (!open) return null;
 
-                <div className="w-screen h-screen  fixed top-0 left-0  flex justify-center ">
-                    <div className="flex flex-col justify-center">
-                        <span className="bg-white opacity-100 p-4 rounded fixed ">
-                            <div className="flex justify-end">
-                                <div onClick={onClose}>
-                                    <CrossIcon />
-                                </div>
-                            </div>
-                            <div>
-                                <Input ref={titleRef} placeholder={"Title"} />
-                                <Input ref={linkRef} placeholder={"Link"} />
-                            </div>
-                            <h1>Type</h1>
-                            <div className="flex gap-4 justify-center pb-2 items-center">
-                                <Button
-                                    text="Youtube"
-                                    variant={type === ContentType.Youtube ? "primary" : "secondary"}
-                                    onClick={() => setType(ContentType.Youtube)}
-                                />
-                                <Button
-                                    text="twitter"
-                                    variant={type === ContentType.Twitter ? "primary" : "secondary"}
-                                    onClick={() => setType(ContentType.Twitter)}
-                                />
-                            </div>
-                            <div className="flex justify-center">
-                                <Button onClick={addContent} variant="primary" text="Submit">
-                                </Button></div>
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        onClick={onClose}
+      />
 
-                        </span>
-                    </div>
-                </div>
-                {/* <div className="flex flex-col justify-center">
-                        <span className="bg-white opacity-100 p-4 rounded fixed top-0">
-                            <div className="flex justify-end">
-                                <div onClick={onClose}>
-                                    <CrossIcon />
-                                </div>
-                            </div>
-                            <div>
-                                <Input ref={titleRef} placeholder={"Title"} />
-                                <Input ref={linkRef} placeholder={"Link"} />
-                            </div>
-                            <h1>Type</h1>
-                            <div className="flex gap-4 justify-center pb-2 items-center">
-                                <Button
-                                    text="Youtube"
-                                    variant={type === ContentType.Youtube ? "primary" : "secondary"}
-                                    onClick={() => setType(ContentType.Youtube)}
-                                />
-                                <Button
-                                    text="X"
-                                    variant={type === ContentType.X ? "primary" : "secondary"}
-                                    onClick={() => setType(ContentType.X)}
-                                />
-                            </div>
-                            <div className="flex justify-center">
-                                <Button onClick={addContent} variant="primary" text="Submit">
-                                </Button></div>
+      {/* Modal */}
+      <div className="relative w-full max-w-md rounded-[2rem] bg-white shadow-2xl border border-slate-200 p-7 animate-in fade-in zoom-in duration-200">
+        {/* Header */}
+        <div className="flex items-start justify-between mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-slate-800">Add Content</h2>
 
-                        </span>
-                    </div> */}
-            </div>)}
+            <p className="text-slate-500 mt-1 text-sm">
+              Save a YouTube video or Twitter post
+            </p>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="rounded-xl p-2 text-slate-500 hover:bg-slate-100 transition"
+          >
+            <CrossIcon />
+          </button>
         </div>
-    );
+
+        {/* Inputs */}
+        <div className="space-y-4">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-600">
+              Title
+            </label>
+
+            <Input ref={titleRef} placeholder="Enter title" />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-600">
+              Link
+            </label>
+
+            <Input ref={linkRef} placeholder="Paste URL" />
+          </div>
+        </div>
+
+        {/* Type */}
+        <div className="mt-6">
+          <h3 className="text-sm font-medium text-slate-600 mb-3">
+            Content Type
+          </h3>
+
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={() => setType(ContentType.Youtube)}
+              className={`rounded-2xl py-3 font-medium transition-all
+                ${
+                  type === ContentType.Youtube
+                    ? "bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-md"
+                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                }`}
+            >
+              📺 Youtube
+            </button>
+
+            <button
+              onClick={() => setType(ContentType.Twitter)}
+              className={`rounded-2xl py-3 font-medium transition-all
+                ${
+                  type === ContentType.Twitter
+                    ? "bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-md"
+                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                }`}
+            >
+              🐦 Twitter
+            </button>
+          </div>
+        </div>
+
+        {/* Submit */}
+        <div className="mt-7">
+          <Button
+            onClick={addContent}
+            variant="primary"
+            text="Save Content"
+            fullWidth={true}
+            loading={loading}
+          />
+        </div>
+      </div>
+    </div>
+  );
 }

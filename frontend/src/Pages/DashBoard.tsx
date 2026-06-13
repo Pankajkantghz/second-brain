@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
+
 import axios from "axios";
 import { toast } from "react-toastify";
 
 import { Sidebar } from "../components/Sidebar";
+
 import CreateContentModel from "../components/CreateContentModel";
 import EditContentModal from "../components/EditContentModal";
 
@@ -12,83 +14,148 @@ import ContentGrid from "../components/dashboard/ContentGrid";
 import EmptyState from "../components/dashboard/EmptyState";
 
 import useContent from "../hooks/useContent";
+
 import { Backend_URL } from "../config";
 
 const DashBoard = () => {
+  /* Sidebar */
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  /* Modals */
   const [modalOpen, setModalOpen] = useState(false);
+
   const [editOpen, setEditOpen] = useState(false);
-  
-  // 1. Hoisted global state managing total system grid structural responsive actions
-  const [collapsed, setCollapsed] = useState(false);
 
+  /* Filters */
   const [selectedType, setSelectedType] = useState("All");
+
   const [selectedTag, setSelectedTag] = useState("");
-  const [selectedContent, setSelectedContent] = useState({ id: "", title: "" });
 
-  const { contents, refresh } = useContent();
+  /* Selected Content */
+  const [selectedContent, setSelectedContent] = useState({
+    id: "",
+    title: "",
+  });
 
+  /* Content Hook */
+  const { contents = [], refresh } = useContent() || {};
+
+  /* Fetch Content */
   useEffect(() => {
-    refresh();
-  }, [modalOpen, editOpen]);
+    refresh?.();
+  }, []);
 
-  const youtubeCount = contents.filter((item) => item.type === "Youtube").length;
-  const twitterCount = contents.filter((item) => item.type === "Twitter").length;
-  const websiteCount = contents.filter((item) => item.type === "Website").length;
+  /* Stats */
+  const stats = useMemo(() => {
+    return {
+      total: contents.length,
 
-  const allTags = useMemo(
-    () => [...new Set(contents.flatMap((item) => item.tags || []))],
-    [contents],
-  );
+      youtube: contents.filter((item) => item.type?.toLowerCase() === "youtube")
+        .length,
 
+      twitter: contents.filter((item) => item.type?.toLowerCase() === "twitter")
+        .length,
+
+      website: contents.filter((item) => item.type?.toLowerCase() === "website")
+        .length,
+    };
+  }, [contents]);
+
+  /* Unique Tags */
+  const allTags = useMemo(() => {
+    return [...new Set(contents.flatMap((item) => item.tags || []))];
+  }, [contents]);
+
+  /* Filtered Content */
   const filteredContents = useMemo(() => {
     return contents.filter((item) => {
-      const matchesType = selectedType === "All" || item.type === selectedType;
+      const matchesType =
+        selectedType === "All" ||
+        item.type?.toLowerCase() === selectedType.toLowerCase();
+
       const matchesTag = !selectedTag || item.tags?.includes(selectedTag);
+
       return matchesType && matchesTag;
     });
   }, [contents, selectedType, selectedTag]);
 
+  /* Share Brain */
   const handleShare = async () => {
     try {
       const response = await axios.post(
         `${Backend_URL}/api/v1/brain/share`,
-        { share: true },
-        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } },
+        {
+          share: true,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
       );
+
       const shareUrl = `http://localhost:5173/share/${response.data.hash}`;
+
       await navigator.clipboard.writeText(shareUrl);
-      toast.success("Share link copied");
+
+      toast.success("Brain link copied");
     } catch {
-      toast.error("Failed to share");
+      toast.error("Failed to share brain");
     }
   };
 
+  /* Delete Content */
   const handleDelete = async (contentId: string) => {
     try {
       await axios.delete(`${Backend_URL}/api/v1/content`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        data: { contentId },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+
+        data: {
+          contentId,
+        },
       });
+
       toast.success("Content deleted");
-      refresh();
+
+      refresh?.();
     } catch {
       toast.error("Delete failed");
     }
   };
 
+  /* Edit Content */
+  const handleEdit = (id: string, title: string) => {
+    setSelectedContent({
+      id,
+      title,
+    });
+
+    setEditOpen(true);
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50/50">
+    <div className="min-h-screen bg-slate-100">
+      {/* Sidebar */}
       <Sidebar
         tags={allTags}
         selectedType={selectedType}
         onTypeChange={setSelectedType}
         selectedTag={selectedTag}
         onTagChange={setSelectedTag}
-        collapsed={collapsed}
-        onToggleCollapse={() => setCollapsed(!collapsed)}
+        collapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
       />
 
-      <CreateContentModel open={modalOpen} onClose={() => setModalOpen(false)} />
+      {/* Create Modal */}
+      <CreateContentModel
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        refresh={refresh}
+      />
+
+      {/* Edit Modal */}
       <EditContentModal
         open={editOpen}
         onClose={() => setEditOpen(false)}
@@ -97,37 +164,46 @@ const DashBoard = () => {
         refresh={refresh}
       />
 
-      {/* 2. Dynamic main tracking space container layout:
-        Changes margin-left cleanly from ml-72 to ml-24 over a 300ms transition 
-      */}
-      <main 
-        className={`min-h-screen px-8 py-6 transition-all duration-300 ease-in-out ${
-          collapsed ? "ml-24" : "ml-72"
+      {/* Main Content */}
+      <main
+        className={`min-h-screen px-6 py-6 transition-all duration-300 ${
+          sidebarCollapsed ? "ml-24" : "ml-72"
         }`}
       >
-        <DashboardHeader onAdd={() => setModalOpen(true)} onShare={handleShare} />
-        
-        <DashboardStats
-          total={contents.length}
-          youtubeCount={youtubeCount}
-          twitterCount={twitterCount}
-          websiteCount={websiteCount}
+        {/* Header */}
+        <DashboardHeader
+          onAdd={() => setModalOpen(true)}
+          onShare={handleShare}
         />
 
-        <div className="mt-8">
+        {/* Stats */}
+        <DashboardStats
+          total={stats.total}
+          youtubeCount={stats.youtube}
+          twitterCount={stats.twitter}
+          websiteCount={stats.website}
+        />
+
+        {/* Content */}
+        <section className="mt-8">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-slate-800">Saved Content</h2>
+
+            <p className="mt-1 text-slate-500">
+              Your saved knowledge, links, and resources.
+            </p>
+          </div>
+
           {filteredContents.length > 0 ? (
             <ContentGrid
               contents={filteredContents}
               onDelete={handleDelete}
-              onEdit={(id, title) => {
-                setSelectedContent({ id, title });
-                setEditOpen(true);
-              }}
+              onEdit={handleEdit}
             />
           ) : (
             <EmptyState onAdd={() => setModalOpen(true)} />
           )}
-        </div>
+        </section>
       </main>
     </div>
   );

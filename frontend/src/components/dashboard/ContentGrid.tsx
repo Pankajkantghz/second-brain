@@ -1,8 +1,19 @@
 import Card from "../Card";
 
+interface Content {
+  _id: string;
+  title: string;
+  link: string;
+  type: "Twitter" | "Youtube" | "Website" | string;
+
+  tags?: string[];
+}
+
 interface ContentGridProps {
-  contents: any[];
-  onDelete: (id: string) => void;
+  contents: Content[];
+
+  onDelete: (contentId: string) => void;
+
   onEdit: (id: string, title: string) => void;
 }
 
@@ -11,24 +22,31 @@ export default function ContentGrid({
   onDelete,
   onEdit,
 }: ContentGridProps) {
+  if (!contents || contents.length === 0) {
+    return null;
+  }
+
   return (
-    /* 
-      Responsive Grid Blueprint:
-      - grid-cols-1: Mobile views default to a single stack
-      - md:grid-cols-2: Tablets snap to 2 columns
-      - lg:grid-cols-3: Smaller desktops snap to 3 columns
-      - xl:grid-cols-4: Standard monitors expand seamlessly to 4 columns
-    */
-    <div className="relative z-0 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 transition-all duration-300">
-      {contents.map(({ _id, title, link, type, tags }) => (
+    <div
+      className="
+        grid
+        grid-cols-1
+        gap-6
+        sm:grid-cols-1
+        md:grid-cols-2
+        xl:grid-cols-3
+        2xl:grid-cols-4
+      "
+    >
+      {contents.map((item) => (
         <Card
-          key={_id}
-          title={title}
-          link={link}
-          type={type}
-          tags={tags}
-          onDelete={() => onDelete(_id)}
-          onEdit={() => onEdit(_id, title)}
+          key={item._id}
+          title={item.title}
+          link={item.link}
+          type={item.type}
+          tags={item.tags || []}
+          onDelete={() => onDelete(item._id)}
+          onEdit={() => onEdit(item._id, item.title)}
         />
       ))}
     </div>

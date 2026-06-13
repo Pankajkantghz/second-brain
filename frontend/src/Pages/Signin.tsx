@@ -1,6 +1,8 @@
 import axios from "axios";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+
 import { Link, useNavigate } from "react-router-dom";
+
 import { toast } from "react-toastify";
 
 import { Button } from "../components/Button";
@@ -15,16 +17,37 @@ export default function Signin() {
 
   const navigate = useNavigate();
 
-  async function signin() {
+  const [loading, setLoading] = useState(false);
+
+  /* Redirect if already logged in */
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      navigate("/dashboard");
+    }
+  }, [navigate]);
+
+  const signin = async () => {
+    const email = emailRef.current?.value.trim() || "";
+
+    const password = passwordRef.current?.value || "";
+
+    /* Validation */
+    if (!email) {
+      toast.error("Email is required");
+
+      return;
+    }
+
+    if (!password) {
+      toast.error("Password is required");
+
+      return;
+    }
+
     try {
-      const email = emailRef.current?.value;
-
-      const password = passwordRef.current?.value;
-
-      if (!email || !password) {
-        toast.error("Please fill all fields");
-        return;
-      }
+      setLoading(true);
 
       const response = await axios.post(`${Backend_URL}/api/v1/signin`, {
         email,
@@ -33,7 +56,7 @@ export default function Signin() {
 
       localStorage.setItem("token", response.data.token);
 
-      toast.success("Welcome back");
+      toast.success("Welcome back 👋");
 
       navigate("/dashboard");
     } catch (error: any) {
@@ -42,15 +65,28 @@ export default function Signin() {
       toast.error(message);
 
       console.log(error);
+    } finally {
+      setLoading(false);
     }
-  }
+  };
+
+  /* Enter Key */
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      signin();
+    }
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-indigo-100 via-white to-purple-100 px-4">
-      <div className="w-full max-w-md rounded-3xl border border-slate-100 bg-white p-8 shadow-2xl">
-        {/* Heading */}
+      <div className="w-full max-w-md rounded-[36px] border border-slate-100 bg-white p-8 shadow-[0_20px_60px_rgba(0,0,0,0.08)]">
+        {/* Header */}
         <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold text-slate-800">Welcome Back</h1>
+          
+
+          <h1 className="text-4xl font-bold tracking-tight text-slate-800">
+            Welcome Back
+          </h1>
 
           <p className="mt-2 text-slate-500">
             Sign in to access your second brain.
@@ -72,7 +108,12 @@ export default function Signin() {
               Password
             </label>
 
-            <Input ref={passwordRef} placeholder="Enter password" />
+            <Input
+              ref={passwordRef}
+              type="password"
+              placeholder="Enter password"
+              onKeyDown={handleKeyDown}
+            />
           </div>
         </div>
 
@@ -81,9 +122,9 @@ export default function Signin() {
           <Button
             onClick={signin}
             variant="primary"
-            text="Sign In"
+            text={loading ? "Signing In..." : "Sign In"}
             fullWidth
-            loading={false}
+            loading={loading}
           />
         </div>
 
@@ -92,7 +133,7 @@ export default function Signin() {
           Don’t have an account?{" "}
           <Link
             to="/signup"
-            className="font-semibold text-indigo-600 hover:underline"
+            className="font-semibold text-indigo-600 transition hover:text-indigo-700 hover:underline"
           >
             Create Account
           </Link>

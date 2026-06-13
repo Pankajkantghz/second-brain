@@ -8,22 +8,32 @@ interface EmptyStateProps {
 
 export default function EmptyState({ onAdd }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-300 bg-white p-14 text-center shadow-sm">
-      <div className="mb-4 text-6xl">📂</div>
+    <div className="flex min-h-[420px] items-center justify-center">
+      <div className="w-full max-w-2xl rounded-[36px] border border-dashed border-slate-300 bg-white px-8 py-16 text-center shadow-sm">
+        {/* Icon */}
+        <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-[28px] bg-gradient-to-br from-indigo-100 to-purple-100 text-5xl shadow-sm">
+          🧠
+        </div>
 
-      <h3 className="text-2xl font-semibold text-slate-700">No content yet</h3>
+        {/* Heading */}
+        <h2 className="mt-8 text-3xl font-bold tracking-tight text-slate-800">
+          Your brain is empty
+        </h2>
 
-      <p className="mt-2 max-w-md text-slate-500">
-        Add videos, tweets and links to start building your second brain.
-      </p>
+        <p className="mx-auto mt-3 max-w-md text-slate-500">
+          Start saving videos, tweets, websites, and resources to build your
+          second brain.
+        </p>
 
-      <div className="mt-6">
-        <Button
-          onClick={onAdd}
-          variant="primary"
-          text="Add Content"
-          startIcon={<PlusIcon />}
-        />
+        {/* CTA */}
+        <div className="mt-8 flex justify-center">
+          <Button
+            onClick={onAdd}
+            variant="primary"
+            text="Add Content"
+            startIcon={<PlusIcon />}
+          />
+        </div>
       </div>
     </div>
   );

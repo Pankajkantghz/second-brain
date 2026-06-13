@@ -1,19 +1,23 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+
 import axios from "axios";
 import { toast } from "react-toastify";
 
-import CrossIcon from "../icons/CrossIcon";
-import Input from "./Input";
-import { Button } from "./Button";
-
 import { Backend_URL } from "../config";
+
+import { Button } from "./Button";
+import Input from "./Input";
 
 interface EditContentModalProps {
   open: boolean;
+
   onClose: () => void;
+
   contentId: string;
+
   currentTitle: string;
-  refresh: () => void;
+
+  refresh?: () => void;
 }
 
 export default function EditContentModal({
@@ -25,20 +29,48 @@ export default function EditContentModal({
 }: EditContentModalProps) {
   const titleRef = useRef<HTMLInputElement>(null);
 
+  const [loading, setLoading] = useState(false);
+
+  /* Escape Close */
   useEffect(() => {
-    if (titleRef.current) {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+
+    return () => {
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [onClose]);
+
+  /* Set current title */
+  useEffect(() => {
+    if (open && titleRef.current) {
       titleRef.current.value = currentTitle;
     }
-  }, [currentTitle]);
+  }, [open, currentTitle]);
 
-  const updateContent = async () => {
+  if (!open) return null;
+
+  const handleUpdate = async () => {
+    const title = titleRef.current?.value.trim() || "";
+
+    /* Validation */
+    if (!title) {
+      toast.error("Title is required");
+      return;
+    }
+
+    if (title.length < 3) {
+      toast.error("Title must be at least 3 characters");
+      return;
+    }
+
     try {
-      const title = titleRef.current?.value;
-
-      if (!title) {
-        toast.error("Title required");
-        return;
-      }
+      setLoading(true);
 
       await axios.put(
         `${Backend_URL}/api/v1/content`,
@@ -55,47 +87,53 @@ export default function EditContentModal({
 
       toast.success("Content updated");
 
-      refresh();
+      refresh?.();
+
       onClose();
-    } catch {
-      toast.error("Update failed");
+    } catch (error: any) {
+      const message =
+        error.response?.data?.message || "Failed to update content";
+
+      toast.error(message);
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (!open) return null;
-
   return (
-    <div>
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
       {/* Backdrop */}
-      <div className="fixed left-0 top-0 z-40 h-screen w-screen bg-black/40 backdrop-blur-sm" />
+      <div className="absolute inset-0" onClick={onClose} />
 
       {/* Modal */}
-      <div className="fixed left-0 top-0 z-50 flex h-screen w-screen items-center justify-center">
-        <div className="w-[420px] rounded-3xl bg-white p-6 shadow-2xl">
-          {/* Header */}
-          <div className="mb-5 flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-slate-800">
-              Edit Content
-            </h2>
+      <div className="relative z-10 w-full max-w-lg rounded-[32px] border border-slate-200 bg-white p-8 shadow-[0_30px_80px_rgba(0,0,0,0.2)]">
+        {/* Header */}
+        <div className="mb-7">
+          <h2 className="text-3xl font-bold text-slate-800">Edit Content</h2>
 
-            <button
-              onClick={onClose}
-              className="rounded-xl p-2 hover:bg-slate-100"
-            >
-              <CrossIcon />
-            </button>
-          </div>
+          <p className="mt-2 text-slate-500">
+            Update the title of your saved content.
+          </p>
+        </div>
 
-          {/* Input */}
-          <div className="mb-5">
-            <Input ref={titleRef} placeholder="Enter title" />
-          </div>
+        {/* Input */}
+        <div>
+          <label className="mb-2 block text-sm font-medium text-slate-600">
+            Title
+          </label>
 
-          {/* Button */}
+          <Input ref={titleRef} placeholder="Enter new title" />
+        </div>
+
+        {/* Actions */}
+        <div className="mt-8 flex justify-end gap-3">
+          <Button onClick={onClose} variant="secondary" text="Cancel" />
+
           <Button
-            onClick={updateContent}
+            onClick={handleUpdate}
             variant="primary"
-            text="Save Changes"
+            text={loading ? "Updating..." : "Save Changes"}
+            loading={loading}
           />
         </div>
       </div>

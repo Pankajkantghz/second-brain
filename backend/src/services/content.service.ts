@@ -1,75 +1,104 @@
 import { ContentModel } from "../models/db";
 
-/* Add Content */
+import { detectType } from "../utils/detectType";
 
-export const addContent = async (body: any, userId: string) => {
-  const { title, link, type } = body;
+/* ---------------- Add Content ---------------- */
 
-  await ContentModel.create({
+interface AddContentParams {
+  title: string;
+  link: string;
+  tags: string[];
+  userId: string;
+}
+
+export const addContent = async ({
+  title,
+  link,
+  tags,
+  userId,
+}: AddContentParams) => {
+  const detectedType = detectType(link);
+
+  return await ContentModel.create({
     title,
     link,
-    type,
-    userId,
-    tags: [],
-  });
-
-  return {
-    status: 201,
-    message: "Content added",
-  };
-};
-
-/* Get Content */
-
-export const getContent = async (userId: string) => {
-  const content = await ContentModel.find({
+    type: detectedType,
+    tags,
     userId,
   });
-
-  return {
-    status: 200,
-    content,
-  };
 };
 
-/* Delete Content */
+/* ---------------- Get Content ---------------- */
+
+export const getContent = async (userId: string, search?: string) => {
+  const query: any = {
+    userId,
+  };
+
+  if (search && search.trim()) {
+    query.$or = [
+      {
+        title: {
+          $regex: search,
+          $options: "i",
+        },
+      },
+
+      {
+        tags: {
+          $regex: search,
+          $options: "i",
+        },
+      },
+    ];
+  }
+
+  return await ContentModel.find(query).sort({
+    createdAt: -1,
+  });
+};
+
+/* ---------------- Delete Content ---------------- */
+
 export const deleteContent = async (contentId: string, userId: string) => {
-  console.log("contentId:", contentId);
-
-  console.log("userId:", userId);
-
-  const result = await ContentModel.deleteOne({
+  return await ContentModel.deleteOne({
     _id: contentId,
     userId,
   });
-
-  console.log(result);
-
-  return {
-    status: 200,
-    message: "Content deleted",
-  };
 };
 
-/* Update Content */
+/* ---------------- Update Content ---------------- */
 
-export const updateContent = async (body: any, userId: string) => {
-  const { contentId, title, link, type } = body;
+interface UpdateContentParams {
+  contentId: string;
+  title: string;
+  link: string;
+  tags: string[];
+  userId: string;
+}
 
-  await ContentModel.updateOne(
+export const updateContent = async ({
+  contentId,
+  title,
+  link,
+  tags,
+  userId,
+}: UpdateContentParams) => {
+  const detectedType = detectType(link);
+
+  return await ContentModel.updateOne(
     {
       _id: contentId,
+
       userId,
     },
     {
       title,
       link,
-      type,
+
+      type: detectedType,
+
+      tags,
     },
   );
-
-  return {
-    status: 200,
-    message: "Content updated",
-  };
 };

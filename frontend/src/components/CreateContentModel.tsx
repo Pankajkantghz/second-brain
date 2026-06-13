@@ -1,15 +1,10 @@
 import { useRef, useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
-import CrossIcon from "../icons/CrossIcon";
-import Input from "./Input";
-import { Button } from "./Button";
 import { Backend_URL } from "../config";
-
-enum ContentType {
-  Youtube = "Youtube",
-  Twitter = "Twitter",
-}
+import { Button } from "./Button";
+import Input from "./Input";
 
 interface CreateContentModelProps {
   open: boolean;
@@ -23,78 +18,127 @@ export default function CreateContentModel({
   const titleRef = useRef<HTMLInputElement>(null);
   const linkRef = useRef<HTMLInputElement>(null);
 
-  const [type, setType] = useState(ContentType.Youtube);
+  const [tags, setTags] =
+    useState("");
 
-  const [loading, setLoading] = useState(false);
-
-  async function addContent() {
-    try {
-      setLoading(true);
-
-      const title = titleRef.current?.value;
-      const link = linkRef.current?.value;
-
-      await axios.post(
-        `${Backend_URL}/api/v1/content`,
-        {
-          title,
-          link,
-          type,
-        },
-        {
-          headers: {
-            Authorization: localStorage.getItem("token"),
-          },
-        },
-      );
-
-      onClose();
-    } catch (error) {
-      console.error(error);
-      alert("Failed to add content");
-    } finally {
-      setLoading(false);
-    }
-  }
+  const [loading, setLoading] =
+    useState(false);
 
   if (!open) return null;
 
+  const handleAddContent =
+    async () => {
+      try {
+        setLoading(true);
+
+        const title =
+          titleRef.current
+            ?.value;
+
+        const link =
+          linkRef.current
+            ?.value;
+
+        if (
+          !title ||
+          !link
+        ) {
+          toast.error(
+            "Please fill all fields"
+          );
+
+          return;
+        }
+
+        const formattedTags =
+          tags
+            .split(",")
+            .map((tag) =>
+              tag.trim()
+            )
+            .filter(
+              Boolean
+            );
+
+        await axios.post(
+          `${Backend_URL}/api/v1/content`,
+          {
+            title,
+            link,
+            tags:
+              formattedTags,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem(
+                "token"
+              )}`,
+            },
+          }
+        );
+
+        toast.success(
+          "Content added"
+        );
+
+        if (
+          titleRef.current
+        ) {
+          titleRef.current.value =
+            "";
+        }
+
+        if (
+          linkRef.current
+        ) {
+          linkRef.current.value =
+            "";
+        }
+
+        setTags("");
+
+        onClose();
+      } catch (
+        error: any
+      ) {
+        toast.error(
+          error.response
+            ?.data
+            ?.message ||
+            "Failed to add content"
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-        onClick={onClose}
-      />
-
-      {/* Modal */}
-      <div className="relative w-full max-w-md rounded-[2rem] bg-white shadow-2xl border border-slate-200 p-7 animate-in fade-in zoom-in duration-200">
+    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      <div className="w-full max-w-lg rounded-[32px] border border-slate-200 bg-white p-8 shadow-2xl">
         {/* Header */}
-        <div className="flex items-start justify-between mb-6">
-          <div>
-            <h2 className="text-2xl font-bold text-slate-800">Add Content</h2>
+        <div className="mb-7">
+          <h2 className="text-3xl font-bold text-slate-800">
+            Add Content
+          </h2>
 
-            <p className="text-slate-500 mt-1 text-sm">
-              Save a YouTube video or Twitter post
-            </p>
-          </div>
-
-          <button
-            onClick={onClose}
-            className="rounded-xl p-2 text-slate-500 hover:bg-slate-100 transition"
-          >
-            <CrossIcon />
-          </button>
+          <p className="mt-2 text-slate-500">
+            Save videos,
+            tweets, and
+            websites.
+          </p>
         </div>
 
         {/* Inputs */}
-        <div className="space-y-4">
+        <div className="space-y-5">
           <div>
             <label className="mb-2 block text-sm font-medium text-slate-600">
               Title
             </label>
 
-            <Input ref={titleRef} placeholder="Enter title" />
+            <Input
+              ref={titleRef}
+              placeholder="React roadmap"
+            />
           </div>
 
           <div>
@@ -102,51 +146,56 @@ export default function CreateContentModel({
               Link
             </label>
 
-            <Input ref={linkRef} placeholder="Paste URL" />
+            <Input
+              ref={linkRef}
+              placeholder="Paste URL..."
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-600">
+              Tags
+            </label>
+
+            <input
+              type="text"
+              value={tags}
+              onChange={(e) =>
+                setTags(
+                  e.target.value
+                )
+              }
+              placeholder="react, frontend, hooks"
+              className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-indigo-500"
+            />
+
+            <p className="mt-2 text-xs text-slate-400">
+              Separate tags
+              using commas
+            </p>
           </div>
         </div>
 
-        {/* Type */}
-        <div className="mt-6">
-          <h3 className="text-sm font-medium text-slate-600 mb-3">
-            Content Type
-          </h3>
-
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => setType(ContentType.Youtube)}
-              className={`rounded-2xl py-3 font-medium transition-all
-                ${
-                  type === ContentType.Youtube
-                    ? "bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-md"
-                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                }`}
-            >
-              📺 Youtube
-            </button>
-
-            <button
-              onClick={() => setType(ContentType.Twitter)}
-              className={`rounded-2xl py-3 font-medium transition-all
-                ${
-                  type === ContentType.Twitter
-                    ? "bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-md"
-                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                }`}
-            >
-              🐦 Twitter
-            </button>
-          </div>
-        </div>
-
-        {/* Submit */}
-        <div className="mt-7">
+        {/* Buttons */}
+        <div className="mt-8 flex justify-end gap-3">
           <Button
-            onClick={addContent}
+            onClick={
+              onClose
+            }
+            variant="secondary"
+            text="Cancel"
+          />
+
+          <Button
+            onClick={
+              handleAddContent
+            }
             variant="primary"
-            text="Save Content"
-            fullWidth={true}
-            loading={loading}
+            text={
+              loading
+                ? "Adding..."
+                : "Add Content"
+            }
           />
         </div>
       </div>

@@ -1,6 +1,6 @@
 import mongoose, { model, Schema } from "mongoose";
 
-/* Database Connection */
+/* ---------------- Database Connection ---------------- */
 
 mongoose
   .connect(process.env.MONGO_URI || "")
@@ -11,7 +11,7 @@ mongoose
     console.log("MongoDB connection error:", error);
   });
 
-/* User Schema */
+/* ---------------- User Schema ---------------- */
 
 const UserSchema = new Schema(
   {
@@ -41,50 +41,47 @@ const UserSchema = new Schema(
 
 export const UserModel = model("User", UserSchema);
 
-/* Tag Schema */
-
-const TagSchema = new Schema(
-  {
-    title: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-    },
-  },
-  {
-    timestamps: true,
-  },
-);
-
-export const TagModel = model("Tag", TagSchema);
-
-/* Content Schema */
+/* ---------------- Content Schema ---------------- */
 
 const ContentSchema = new Schema(
   {
     link: {
       type: String,
       required: true,
+      trim: true,
+
+      validate: {
+        validator: function (value: string) {
+          return /^https?:\/\/.+/.test(value);
+        },
+
+        message: "Invalid URL",
+      },
     },
 
     title: {
       type: String,
       required: true,
+      trim: true,
     },
 
     type: {
       type: String,
-      enum: ["Youtube", "Twitter"],
+
+      enum: ["Youtube", "Twitter", "Website"],
+
       required: true,
     },
 
-    tags: [
-      {
-        type: mongoose.Types.ObjectId,
-        ref: "Tag",
-      },
-    ],
+    tags: {
+      type: [String],
+      default: [],
+    },
+
+    isPinned: {
+      type: Boolean,
+      default: false,
+    },
 
     userId: {
       type: mongoose.Types.ObjectId,
@@ -99,9 +96,14 @@ const ContentSchema = new Schema(
   },
 );
 
+/* Faster content fetch */
+ContentSchema.index({
+  userId: 1,
+});
+
 export const ContentModel = model("Content", ContentSchema);
 
-/* Share Link Schema */
+/* ---------------- Share Link Schema ---------------- */
 
 const LinkSchema = new Schema(
   {
@@ -109,6 +111,7 @@ const LinkSchema = new Schema(
       type: String,
       required: true,
       unique: true,
+      trim: true,
     },
 
     userId: {

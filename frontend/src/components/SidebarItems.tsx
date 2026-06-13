@@ -1,20 +1,38 @@
-import { ReactElement } from "react";
-
 interface SidebarItemsProps {
   text: string;
-  icon: ReactElement;
+  icon: React.ReactNode;
+  active?: boolean;
+  collapsed: boolean; // Tells item whether to drop string labels
+  onClick?: () => void;
 }
 
-export default function SidebarItems({ text, icon }: SidebarItemsProps) {
+export default function SidebarItems({
+  text,
+  icon,
+  active = false,
+  collapsed,
+  onClick,
+}: SidebarItemsProps) {
   return (
-    <button className="group flex w-full items-center gap-4 rounded-2xl px-4 py-3 text-slate-700 transition-all duration-200 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 hover:text-indigo-600 hover:shadow-sm">
-      {/* Icon */}
-      <div className="text-slate-500 transition-colors duration-200 group-hover:text-indigo-600">
+    <button
+      onClick={onClick}
+      className={`flex w-full items-center rounded-2xl px-4 py-3 transition-all duration-200 ${
+        collapsed ? "justify-center gap-0" : "justify-start gap-4"
+      } ${
+        active
+          ? "bg-indigo-50 text-indigo-700 font-semibold"
+          : "text-slate-600 hover:bg-slate-50"
+      }`}
+    >
+      <span className="text-xl flex shrink-0 items-center justify-center w-6 h-6">
         {icon}
-      </div>
+      </span>
 
-      {/* Text */}
-      <span className="font-medium text-base">{text}</span>
+      {!collapsed && (
+        <span className="font-medium whitespace-nowrap transition-opacity duration-200">
+          {text}
+        </span>
+      )}
     </button>
   );
 }

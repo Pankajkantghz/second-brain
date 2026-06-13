@@ -1,4 +1,6 @@
-import { Request, Response } from "express";
+import { Response } from "express";
+
+import { AuthRequest } from "../types/auth.types";
 
 import { signupUser, signinUser } from "../services/auth.service";
 

@@ -5,7 +5,7 @@ import { signupUser, signinUser } from "../services/auth.service";
 import { signupSchema, signinSchema } from "../validators/auth.validation";
 
 /* Signup */
-export const signup = async (req: Request, res: Response) => {
+export const signup = async (req: AuthRequest, res: Response) => {
   try {
     const validated = signupSchema.parse(req.body);
 
@@ -24,7 +24,7 @@ export const signup = async (req: Request, res: Response) => {
 };
 
 /* Signin */
-export const signin = async (req: Request, res: Response) => {
+export const signin = async (req: AuthRequest, res: Response) => {
   try {
     const validated = signinSchema.parse(req.body);
 
@@ -39,7 +39,7 @@ export const signin = async (req: Request, res: Response) => {
 };
 
 /* Logout */
-export const logout = async (req: Request, res: Response) => {
+export const logout = async (req: AuthRequest, res: Response) => {
   try {
     return res.json({
       message: "Logged out successfully",

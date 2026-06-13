@@ -1,4 +1,6 @@
-import { Request, Response } from "express";
+import { Response } from "express";
+
+import { AuthRequest } from "../types/auth.types";
 
 import {
   addContent,
@@ -14,7 +16,7 @@ import {
 
 /* ---------------- Add Content ---------------- */
 
-export const addContentController = async (req: Request, res: Response) => {
+export const addContentController = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.userId;
 
@@ -67,7 +69,7 @@ export const addContentController = async (req: Request, res: Response) => {
 
 /* ---------------- Get Content ---------------- */
 
-export const getContentController = async (req: Request, res: Response) => {
+export const getContentController = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.userId;
 
@@ -101,7 +103,7 @@ export const getContentController = async (req: Request, res: Response) => {
 
 /* ---------------- Delete Content ---------------- */
 
-export const deleteContentController = async (req: Request, res: Response) => {
+export const deleteContentController = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.userId;
 
@@ -133,7 +135,7 @@ export const deleteContentController = async (req: Request, res: Response) => {
 
 /* ---------------- Update Content ---------------- */
 
-export const updateContentController = async (req: Request, res: Response) => {
+export const updateContentController = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.userId;
 

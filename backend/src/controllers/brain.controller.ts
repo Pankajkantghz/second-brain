@@ -1,4 +1,9 @@
-import { Request, Response } from "express";
+
+import {
+  Response,
+} from "express";
+
+import { AuthRequest } from "../types/auth.types";
 
 import {
   createShareLink,
@@ -7,7 +12,7 @@ import {
 } from "../services/brain.service";
 
 /* Share Brain */
-export const shareBrain = async (req: Request, res: Response) => {
+export const shareBrain = async (req: AuthRequest, res: Response) => {
   try {
     const { share } = req.body;
 
@@ -38,7 +43,7 @@ export const shareBrain = async (req: Request, res: Response) => {
 };
 
 /* Get Shared Brain */
-export const getSharedBrain = async (req: Request, res: Response) => {
+export const getSharedBrain = async (req: AuthRequest, res: Response) => {
   try {
     const shareLink = Array.isArray(req.params.shareLink)
       ? req.params.shareLink[0]

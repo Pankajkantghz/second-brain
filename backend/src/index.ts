@@ -62,7 +62,7 @@ app.use(
 /* Secure CORS */
 app.use(
   cors({
-    origin: "https://second-brain-app-gilt.vercel.app",
+    origin: "https://second-brain-rust-seven.vercel.app",
 
     methods: ["GET", "POST", "PUT", "DELETE"],
 

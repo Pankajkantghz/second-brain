@@ -1,5 +1,5 @@
-import axios from "axios";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 import BrainIcon from "../icons/BrainIcon";
 import LogoutIcon from "../icons/LogoutIcon";
@@ -7,8 +7,6 @@ import XIcon from "../icons/XIcon";
 import YoutubeIcons from "../icons/YoutubeIcons";
 
 import SidebarItems from "./SidebarItems";
-
-import { Backend_URL } from "../config";
 
 interface SidebarProps {
   tags: string[];
@@ -32,18 +30,15 @@ export function Sidebar({
   collapsed,
   onToggleCollapse,
 }: SidebarProps) {
-  const handleLogout = async () => {
-    try {
-      await axios.post(`${Backend_URL}/api/v1/logout`);
+  const navigate = useNavigate();
 
-      localStorage.removeItem("token");
+  /* Logout */
+  const handleLogout = () => {
+    localStorage.removeItem("token");
 
-      toast.success("Logged out");
+    toast.success("Logged out");
 
-      window.location.href = "/signin";
-    } catch {
-      toast.error("Logout failed");
-    }
+    navigate("/signin");
   };
 
   return (
@@ -58,7 +53,7 @@ export function Sidebar({
           {/* Logo */}
           <div
             className={`flex items-center overflow-hidden ${
-              collapsed ? "justify-center w-full" : "gap-4"
+              collapsed ? "w-full justify-center" : "gap-4"
             }`}
           >
             <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md">
@@ -76,7 +71,7 @@ export function Sidebar({
             )}
           </div>
 
-          {/* Toggle */}
+          {/* Collapse Button */}
           <button
             onClick={onToggleCollapse}
             className={`absolute top-1/2 -translate-y-1/2 rounded-xl border border-slate-200 bg-white p-2 text-slate-500 shadow-sm transition hover:bg-slate-50 hover:text-slate-700 ${
@@ -159,6 +154,7 @@ export function Sidebar({
                 collapsed ? "flex-col items-center" : "flex-wrap px-2"
               }`}
             >
+              {/* All Tags */}
               <button
                 onClick={() => onTagChange("")}
                 className={`rounded-full px-3 py-1 text-xs font-medium transition ${

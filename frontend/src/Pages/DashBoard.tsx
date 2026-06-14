@@ -35,12 +35,14 @@ const DashBoard = () => {
   const [selectedContent, setSelectedContent] = useState({
     id: "",
     title: "",
+    link: "",
+    tags: [] as string[],
   });
 
   /* Content Hook */
   const { contents = [], refresh } = useContent() || {};
 
-  /* Fetch Content */
+  /* Initial Fetch */
   useEffect(() => {
     refresh?.();
   }, []);
@@ -61,12 +63,12 @@ const DashBoard = () => {
     };
   }, [contents]);
 
-  /* Unique Tags */
+  /* Tags */
   const allTags = useMemo(() => {
     return [...new Set(contents.flatMap((item) => item.tags || []))];
   }, [contents]);
 
-  /* Filtered Content */
+  /* Filter Content */
   const filteredContents = useMemo(() => {
     return contents.filter((item) => {
       const matchesType =
@@ -94,7 +96,7 @@ const DashBoard = () => {
         },
       );
 
-      const shareUrl = `http://localhost:5173/share/${response.data.hash}`;
+      const shareUrl = `${window.location.origin}/share/${response.data.hash}`;
 
       await navigator.clipboard.writeText(shareUrl);
 
@@ -126,10 +128,12 @@ const DashBoard = () => {
   };
 
   /* Edit Content */
-  const handleEdit = (id: string, title: string) => {
+  const handleEdit = (content: any) => {
     setSelectedContent({
-      id,
-      title,
+      id: content._id,
+      title: content.title,
+      link: content.link,
+      tags: content.tags || [],
     });
 
     setEditOpen(true);
@@ -161,10 +165,12 @@ const DashBoard = () => {
         onClose={() => setEditOpen(false)}
         contentId={selectedContent.id}
         currentTitle={selectedContent.title}
+        currentLink={selectedContent.link}
+        currentTags={selectedContent.tags}
         refresh={refresh}
       />
 
-      {/* Main Content */}
+      {/* Main */}
       <main
         className={`min-h-screen px-6 py-6 transition-all duration-300 ${
           sidebarCollapsed ? "ml-24" : "ml-72"

@@ -14,7 +14,7 @@ interface ContentGridProps {
 
   onDelete: (contentId: string) => void;
 
-  onEdit: (id: string, title: string) => void;
+  onEdit: (content: Content) => void;
 }
 
 export default function ContentGrid({
@@ -46,7 +46,7 @@ export default function ContentGrid({
           type={item.type}
           tags={item.tags || []}
           onDelete={() => onDelete(item._id)}
-          onEdit={() => onEdit(item._id, item.title)}
+          onEdit={() => onEdit(item)}
         />
       ))}
     </div>

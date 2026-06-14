@@ -80,25 +80,21 @@ interface UpdateContentParams {
 export const updateContent = async ({
   contentId,
   title,
-  link,
-  tags,
   userId,
-}: UpdateContentParams) => {
-  const detectedType = detectType(link);
+}: {
+  contentId: string;
 
+  title: string;
+
+  userId: string;
+}) => {
   return await ContentModel.updateOne(
     {
       _id: contentId,
-
       userId,
     },
     {
       title,
-      link,
-
-      type: detectedType,
-
-      tags,
     },
   );
 };

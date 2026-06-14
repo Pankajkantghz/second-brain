@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 
 import { Link, useNavigate } from "react-router-dom";
+import ThemeToggle from "../components/ThemeToggle";
 
 import { toast } from "react-toastify";
 
@@ -116,84 +117,87 @@ export default function Signup() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-indigo-100 via-white to-purple-100 px-4">
-      <div className="w-full max-w-md rounded-[36px] border border-slate-100 bg-white p-8 shadow-[0_20px_60px_rgba(0,0,0,0.08)]">
-        {/* Header */}
-        <div className="mb-8 text-center">
-         
+  <div className="relative flex min-h-screen items-center justify-center bg-gradient-to-br from-indigo-100 via-white to-purple-100 px-4 transition-colors dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+    {/* Theme Toggle */}
+    <div className="absolute right-5 top-5">
+      <ThemeToggle />
+    </div>
 
-          <h1 className="text-4xl font-bold tracking-tight text-slate-800">
-            Create Account
-          </h1>
+    <div className="w-full max-w-md rounded-[36px] border border-slate-100 bg-white p-8 shadow-[0_20px_60px_rgba(0,0,0,0.08)] transition-colors dark:border-slate-700 dark:bg-slate-800">
+      {/* Header */}
+      <div className="mb-8 text-center">
+        <h1 className="text-4xl font-bold tracking-tight text-slate-800 dark:text-white">
+          Create Account
+        </h1>
 
-          <p className="mt-2 text-slate-500">
-            Join Brainly and organize your knowledge.
-          </p>
-        </div>
+        <p className="mt-2 text-slate-500 dark:text-slate-300">
+          Join Brainly and organize your knowledge.
+        </p>
+      </div>
 
-        {/* Inputs */}
-        <div className="space-y-5">
-          <div>
-            <label className="mb-2 block text-sm font-medium text-slate-600">
-              Full Name
-            </label>
+      {/* Inputs */}
+      <div className="space-y-5">
+        <div>
+          <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
+            Full Name
+          </label>
 
-            <Input
-              ref={nameRef}
-              placeholder="John Doe"
-              onKeyDown={handleKeyDown}
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-medium text-slate-600">
-              Email
-            </label>
-
-            <Input
-              ref={emailRef}
-              placeholder="john@email.com"
-              onKeyDown={handleKeyDown}
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-medium text-slate-600">
-              Password
-            </label>
-
-            <input
-              ref={passwordRef}
-              type="password"
-              placeholder="Minimum 6 characters"
-              onKeyDown={handleKeyDown}
-              className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-indigo-500"
-            />
-          </div>
-        </div>
-
-        {/* Button */}
-        <div className="mt-6">
-          <Button
-            onClick={signup}
-            variant="primary"
-            text={loading ? "Creating Account..." : "Create Account"}
-            fullWidth
-            loading={loading}
+          <Input
+            ref={nameRef}
+            placeholder="John Doe"
+            onKeyDown={handleKeyDown}
           />
         </div>
 
-        {/* Footer */}
-        <p className="mt-6 text-center text-sm text-slate-500">
-          Already have an account?{" "}
-          <Link
-            to="/signin"
-            className="font-semibold text-indigo-600 transition hover:text-indigo-700 hover:underline"
-          >
-            Sign In
-          </Link>
-        </p>
+        <div>
+          <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
+            Email
+          </label>
+
+          <Input
+            ref={emailRef}
+            placeholder="john@email.com"
+            onKeyDown={handleKeyDown}
+          />
+        </div>
+
+        <div>
+          <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
+            Password
+          </label>
+
+          <input
+            ref={passwordRef}
+            type="password"
+            placeholder="Minimum 6 characters"
+            onKeyDown={handleKeyDown}
+            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition focus:border-indigo-500 dark:border-slate-600 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-400"
+          />
+        </div>
       </div>
+
+      {/* Button */}
+      <div className="mt-6">
+        <Button
+          onClick={signup}
+          variant="primary"
+          text={loading ? "Creating Account..." : "Create Account"}
+          fullWidth
+          loading={loading}
+        />
+      </div>
+
+      {/* Footer */}
+      <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-300">
+        Already have an account?{" "}
+        <Link
+          to="/signin"
+          className="font-semibold text-indigo-600 transition hover:text-indigo-700 hover:underline"
+        >
+          Sign In
+        </Link>
+      </p>
     </div>
-  );
+  </div>
+);
 }

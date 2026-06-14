@@ -12,14 +12,12 @@ interface SharedContent {
   title: string;
   link: string;
   type: "Youtube" | "Twitter" | "Website" | string;
-
   tags?: string[];
 }
 
 interface SharedBrainData {
   username?: string;
   name?: string;
-
   content: SharedContent[];
 }
 
@@ -57,9 +55,11 @@ export default function SharedBrain() {
   /* Loading State */
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-100">
-        <div className="rounded-3xl bg-white px-8 py-6 shadow-sm">
-          <p className="text-lg font-medium text-slate-600">Loading brain...</p>
+      <div className="flex min-h-screen items-center justify-center bg-slate-100 transition-colors dark:bg-slate-900">
+        <div className="rounded-3xl bg-white px-8 py-6 shadow-sm dark:bg-slate-800">
+          <p className="text-lg font-medium text-slate-600 dark:text-slate-300">
+            Loading brain...
+          </p>
         </div>
       </div>
     );
@@ -68,15 +68,15 @@ export default function SharedBrain() {
   /* Invalid Link */
   if (!data) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4">
-        <div className="max-w-md rounded-[32px] bg-white p-10 text-center shadow-sm">
+      <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4 transition-colors dark:bg-slate-900">
+        <div className="max-w-md rounded-[32px] bg-white p-10 text-center shadow-sm dark:bg-slate-800">
           <div className="text-6xl">🧠</div>
 
-          <h2 className="mt-5 text-2xl font-bold text-slate-800">
+          <h2 className="mt-5 text-2xl font-bold text-slate-800 dark:text-white">
             Brain not found
           </h2>
 
-          <p className="mt-2 text-slate-500">
+          <p className="mt-2 text-slate-500 dark:text-slate-300">
             This shared link may be invalid or removed.
           </p>
         </div>
@@ -85,15 +85,14 @@ export default function SharedBrain() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 px-6 py-10">
+    <div className="min-h-screen bg-slate-100 px-6 py-10 transition-colors dark:bg-slate-900">
       {/* Header */}
       <div className="mb-10">
-        <h1 className="text-4xl font-bold tracking-tight text-slate-800">
-          {data.username || data.name || "Shared User"}
-          's Brain
+        <h1 className="text-4xl font-bold tracking-tight text-slate-800 dark:text-white">
+          {data.username || data.name || "Shared User"}'s Brain
         </h1>
 
-        <p className="mt-2 text-slate-500">
+        <p className="mt-2 text-slate-500 dark:text-slate-300">
           Shared links, knowledge, and resources.
         </p>
       </div>
@@ -112,14 +111,14 @@ export default function SharedBrain() {
           ))}
         </div>
       ) : (
-        <div className="rounded-[32px] bg-white p-12 text-center shadow-sm">
+        <div className="rounded-[32px] bg-white p-12 text-center shadow-sm dark:bg-slate-800">
           <div className="text-6xl">📭</div>
 
-          <h2 className="mt-5 text-2xl font-bold text-slate-800">
+          <h2 className="mt-5 text-2xl font-bold text-slate-800 dark:text-white">
             No shared content
           </h2>
 
-          <p className="mt-2 text-slate-500">
+          <p className="mt-2 text-slate-500 dark:text-slate-300">
             This brain does not contain any content yet.
           </p>
         </div>

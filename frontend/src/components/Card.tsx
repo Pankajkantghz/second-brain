@@ -20,6 +20,7 @@ export default function Card({
   onEdit,
 }: CardProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+
   const menuRef = useRef<HTMLDivElement>(null);
 
   /* Close menu outside click */
@@ -31,6 +32,7 @@ export default function Card({
     };
 
     document.addEventListener("mousedown", handleClickOutside);
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -40,8 +42,11 @@ export default function Card({
   useEffect(() => {
     if (type?.toLowerCase() === "twitter") {
       const script = document.createElement("script");
+
       script.src = "https://platform.twitter.com/widgets.js";
+
       script.async = true;
+
       document.body.appendChild(script);
     }
   }, [type, link]);
@@ -50,11 +55,15 @@ export default function Card({
   const getYoutubeEmbedUrl = (url: string) => {
     try {
       const parsed = new URL(url);
+
       if (parsed.hostname === "youtu.be") {
         const videoId = parsed.pathname.slice(1);
+
         return `https://www.youtube.com/embed/${videoId}`;
       }
+
       const videoId = parsed.searchParams.get("v");
+
       return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
     } catch {
       return "";
@@ -68,19 +77,18 @@ export default function Card({
   const handleShare = async () => {
     try {
       await navigator.clipboard.writeText(link);
+
       toast.success("Link copied");
     } catch {
       toast.error("Failed to copy");
     }
+
     setMenuOpen(false);
   };
 
   return (
-    /* FIX: Added dynamic z-index (`menuOpen ? "z-40" : "z-10"`) to the card root. 
-      When the menu is open, this specific card jumps above all other elements and cards on the page.
-    */
     <div
-      className={`group relative overflow-visible rounded-[32px] border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${
+      className={`group relative overflow-visible rounded-[32px] border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-800 ${
         menuOpen ? "z-40" : "z-10"
       }`}
     >
@@ -102,9 +110,8 @@ export default function Card({
       )}
 
       {/* Twitter */}
-
       {type === "Twitter" && (
-        <div className="h-[250px] overflow-hidden rounded-t-[32px] bg-slate-50">
+        <div className="h-[250px] overflow-hidden rounded-t-[32px] bg-slate-50 dark:bg-slate-900">
           <div className="h-full overflow-y-auto p-4">
             <blockquote className="twitter-tweet !m-0">
               <a href={link.replace("x.com", "twitter.com")} />
@@ -115,21 +122,26 @@ export default function Card({
 
       {/* Website */}
       {type?.toLowerCase() === "website" && (
-        <div className="flex h-[230px] flex-col justify-between rounded-t-[32px] bg-gradient-to-br from-slate-50 to-slate-100 p-6">
+        <div className="flex h-[230px] flex-col justify-between rounded-t-[32px] bg-gradient-to-br from-slate-50 to-slate-100 p-6 dark:from-slate-800 dark:to-slate-900">
           <div>
-            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-900 text-2xl text-white">
+            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-900 text-2xl text-white dark:bg-slate-700">
               🌐
             </div>
-            <h3 className="line-clamp-1 text-lg font-semibold text-slate-800">
+
+            <h3 className="line-clamp-1 text-lg font-semibold text-slate-800 dark:text-white">
               {title}
             </h3>
-            <p className="mt-2 line-clamp-2 text-sm text-slate-500">{link}</p>
+
+            <p className="mt-2 line-clamp-2 text-sm text-slate-500 dark:text-slate-300">
+              {link}
+            </p>
           </div>
+
           <a
             href={link}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex w-fit rounded-2xl bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+            className="inline-flex w-fit rounded-2xl bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:opacity-90 dark:bg-slate-700"
           >
             Open Website →
           </a>
@@ -139,17 +151,19 @@ export default function Card({
       {/* Footer */}
       <div className="flex items-start justify-between px-6 py-5">
         <div className="min-w-0 flex-1">
-          <h2 className="truncate text-lg font-semibold text-slate-800">
+          <h2 className="truncate text-lg font-semibold text-slate-800 dark:text-white">
             {title}
           </h2>
+
           <div className="mt-3 flex flex-wrap gap-2">
-            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 dark:bg-slate-700 dark:text-slate-200">
               {type}
             </span>
+
             {tags.map((tag) => (
               <span
                 key={tag}
-                className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-600"
+                className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-300"
               >
                 #{tag}
               </span>
@@ -161,17 +175,16 @@ export default function Card({
         <div ref={menuRef} className="relative shrink-0">
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="rounded-2xl p-3 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
+            className="rounded-2xl p-3 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
           >
             <MoreVerticalIcon />
           </button>
 
           {menuOpen && (
-            /* FIX: Increased z-index to `z-[100]` to explicitly layer above everything */
-            <div className="absolute right-0 top-14 z-[100] min-w-[220px] overflow-hidden rounded-2xl border border-slate-200 bg-white py-2 shadow-[0_25px_60px_rgba(0,0,0,0.25)]">
+            <div className="absolute right-0 top-14 z-[100] min-w-[220px] overflow-hidden rounded-2xl border border-slate-200 bg-white py-2 shadow-[0_25px_60px_rgba(0,0,0,0.25)] dark:border-slate-700 dark:bg-slate-800">
               <button
                 onClick={handleShare}
-                className="w-full px-5 py-3 text-left text-sm font-medium text-slate-700 hover:bg-slate-50"
+                className="w-full px-5 py-3 text-left text-sm font-medium text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-700"
               >
                 Share Link
               </button>
@@ -181,7 +194,7 @@ export default function Card({
                   onEdit?.();
                   setMenuOpen(false);
                 }}
-                className="w-full px-5 py-3 text-left text-sm font-medium text-slate-700 hover:bg-slate-50"
+                className="w-full px-5 py-3 text-left text-sm font-medium text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-700"
               >
                 Edit Content
               </button>
@@ -191,7 +204,7 @@ export default function Card({
                   onDelete?.();
                   setMenuOpen(false);
                 }}
-                className="w-full px-5 py-3 text-left text-sm font-medium text-red-500 hover:bg-red-50"
+                className="w-full px-5 py-3 text-left text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
               >
                 Delete Content
               </button>

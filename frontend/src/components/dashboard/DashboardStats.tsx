@@ -42,19 +42,21 @@ export default function DashboardStats({
       {stats.map((stat) => (
         <div
           key={stat.title}
-          className="group rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+          className="group rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-slate-700 dark:bg-slate-800"
         >
           {/* Top */}
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-500">{stat.title}</p>
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-300">
+                {stat.title}
+              </p>
 
-              <h2 className="mt-3 text-4xl font-bold tracking-tight text-slate-800">
+              <h2 className="mt-3 text-4xl font-bold tracking-tight text-slate-800 dark:text-white">
                 {stat.value}
               </h2>
             </div>
 
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-2xl transition group-hover:scale-105">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-2xl transition group-hover:scale-105 dark:bg-slate-700">
               {stat.icon}
             </div>
           </div>

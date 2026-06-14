@@ -7,6 +7,7 @@ import XIcon from "../icons/XIcon";
 import YoutubeIcons from "../icons/YoutubeIcons";
 
 import SidebarItems from "./SidebarItems";
+import ThemeToggle from "./ThemeToggle";
 
 interface SidebarProps {
   tags: string[];
@@ -43,12 +44,12 @@ export function Sidebar({
 
   return (
     <aside
-      className={`fixed left-0 top-0 z-50 flex h-screen flex-col border-r border-slate-200 bg-white shadow-sm transition-all duration-300 ${
+      className={`fixed left-0 top-0 z-50 flex h-screen flex-col border-r border-slate-200 bg-white shadow-sm transition-all duration-300 dark:border-slate-700 dark:bg-slate-900 ${
         collapsed ? "w-24" : "w-72"
       }`}
     >
       {/* Header */}
-      <div className="border-b border-slate-100 p-5">
+      <div className="border-b border-slate-100 p-5 dark:border-slate-700">
         <div className="relative flex items-center">
           {/* Logo */}
           <div
@@ -62,11 +63,13 @@ export function Sidebar({
 
             {!collapsed && (
               <div className="min-w-0">
-                <h1 className="truncate text-2xl font-bold text-slate-800">
+                <h1 className="truncate text-2xl font-bold text-slate-800 dark:text-white">
                   Brainly
                 </h1>
 
-                <p className="text-sm text-slate-500">Your second brain</p>
+                <p className="text-sm text-slate-500 dark:text-slate-300">
+                  Your second brain
+                </p>
               </div>
             )}
           </div>
@@ -74,7 +77,7 @@ export function Sidebar({
           {/* Collapse Button */}
           <button
             onClick={onToggleCollapse}
-            className={`absolute top-1/2 -translate-y-1/2 rounded-xl border border-slate-200 bg-white p-2 text-slate-500 shadow-sm transition hover:bg-slate-50 hover:text-slate-700 ${
+            className={`absolute top-1/2 -translate-y-1/2 rounded-xl border border-slate-200 bg-white p-2 text-slate-500 shadow-sm transition hover:bg-slate-50 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white ${
               collapsed ? "-right-4" : "right-0"
             }`}
           >
@@ -96,12 +99,19 @@ export function Sidebar({
             </svg>
           </button>
         </div>
+
+        {/* Theme Toggle */}
+        {!collapsed && (
+          <div className="mt-4 flex justify-end">
+            <ThemeToggle />
+          </div>
+        )}
       </div>
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto px-3 py-5">
         {!collapsed && (
-          <p className="mb-4 px-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+          <p className="mb-4 px-3 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
             Content
           </p>
         )}
@@ -144,7 +154,7 @@ export function Sidebar({
         {tags.length > 0 && (
           <div className="mt-8">
             {!collapsed && (
-              <p className="mb-4 px-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+              <p className="mb-4 px-3 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                 Tags
               </p>
             )}
@@ -160,7 +170,7 @@ export function Sidebar({
                 className={`rounded-full px-3 py-1 text-xs font-medium transition ${
                   selectedTag === ""
                     ? "bg-indigo-600 text-white"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
                 }`}
               >
                 {collapsed ? "🏷️" : "All"}
@@ -174,7 +184,7 @@ export function Sidebar({
                     className={`rounded-full px-3 py-1 text-xs font-medium transition ${
                       selectedTag === tag
                         ? "bg-indigo-600 text-white"
-                        : "bg-indigo-50 text-indigo-600 hover:bg-indigo-100"
+                        : "bg-indigo-50 text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-300 dark:hover:bg-indigo-900/50"
                     }`}
                   >
                     #{tag}
@@ -186,7 +196,7 @@ export function Sidebar({
       </div>
 
       {/* Footer */}
-      <div className="border-t border-slate-100 p-4">
+      <div className="border-t border-slate-100 p-4 dark:border-slate-700">
         <button
           onClick={handleLogout}
           className={`flex items-center justify-center gap-2 rounded-2xl bg-red-500 text-white transition hover:bg-red-600 ${

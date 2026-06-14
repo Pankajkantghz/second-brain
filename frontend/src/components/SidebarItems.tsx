@@ -21,8 +21,8 @@ export default function SidebarItems({
         collapsed ? "justify-center px-2 py-3" : "justify-start gap-4 px-4 py-3"
       } ${
         active
-          ? "bg-indigo-50 text-indigo-700 shadow-sm"
-          : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+          ? "bg-indigo-50 text-indigo-700 shadow-sm dark:bg-indigo-900/30 dark:text-indigo-300"
+          : "text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
       }`}
     >
       {/* Active Indicator */}
@@ -34,7 +34,11 @@ export default function SidebarItems({
       <div
         className={`flex shrink-0 items-center justify-center rounded-xl transition-all duration-200 ${
           collapsed ? "h-12 w-12" : "h-10 w-10"
-        } ${active ? "bg-indigo-100" : "group-hover:bg-slate-100"}`}
+        } ${
+          active
+            ? "bg-indigo-100 dark:bg-indigo-900/40"
+            : "group-hover:bg-slate-100 dark:group-hover:bg-slate-700"
+        }`}
       >
         <span className="text-lg">{icon}</span>
       </div>

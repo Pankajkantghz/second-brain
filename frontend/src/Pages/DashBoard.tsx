@@ -140,7 +140,7 @@ const DashBoard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="min-h-screen bg-slate-100 transition-colors dark:bg-slate-900">
       {/* Sidebar */}
       <Sidebar
         tags={allTags}
@@ -151,14 +151,15 @@ const DashBoard = () => {
         collapsed={sidebarCollapsed}
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
       />
+
       {/* Create Modal */}
       <CreateContentModel
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         refresh={refresh}
       />
+
       {/* Edit Modal */}
-      ```tsx
       <EditContentModal
         open={editOpen}
         onClose={() => setEditOpen(false)}
@@ -166,7 +167,7 @@ const DashBoard = () => {
         currentTitle={selectedContent.title}
         refresh={refresh}
       />
-      ```
+
       {/* Main */}
       <main
         className={`min-h-screen px-6 py-6 transition-all duration-300 ${
@@ -190,9 +191,11 @@ const DashBoard = () => {
         {/* Content */}
         <section className="mt-8">
           <div className="mb-6">
-            <h2 className="text-2xl font-bold text-slate-800">Saved Content</h2>
+            <h2 className="text-2xl font-bold text-slate-800 dark:text-white">
+              Saved Content
+            </h2>
 
-            <p className="mt-1 text-slate-500">
+            <p className="mt-1 text-slate-500 dark:text-slate-300">
               Your saved knowledge, links, and resources.
             </p>
           </div>

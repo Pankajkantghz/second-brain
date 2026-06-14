@@ -14,7 +14,7 @@ const variantClasses = {
     "bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-lg hover:scale-[1.02]",
 
   secondary:
-    "bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 hover:shadow-md",
+    "bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 hover:shadow-md dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-700",
 };
 
 const defaultStyles =
@@ -47,10 +47,9 @@ export function Button({
       ) : (
         <>
           {startIcon && (
-            <span className="mr-2 flex items-center">
-              {startIcon}
-            </span>
+            <span className="mr-2 flex items-center">{startIcon}</span>
           )}
+
           {text}
         </>
       )}

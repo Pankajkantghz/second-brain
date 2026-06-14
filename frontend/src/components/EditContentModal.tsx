@@ -61,11 +61,13 @@ export default function EditContentModal({
     /* Validation */
     if (!title) {
       toast.error("Title is required");
+
       return;
     }
 
     if (title.length < 3) {
       toast.error("Title must be at least 3 characters");
+
       return;
     }
 
@@ -106,19 +108,21 @@ export default function EditContentModal({
       <div className="absolute inset-0" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative z-10 w-full max-w-lg rounded-[32px] border border-slate-200 bg-white p-8 shadow-[0_30px_80px_rgba(0,0,0,0.2)]">
+      <div className="relative z-10 w-full max-w-lg rounded-[32px] border border-slate-200 bg-white p-8 shadow-[0_30px_80px_rgba(0,0,0,0.2)] transition-colors dark:border-slate-700 dark:bg-slate-800">
         {/* Header */}
         <div className="mb-7">
-          <h2 className="text-3xl font-bold text-slate-800">Edit Content</h2>
+          <h2 className="text-3xl font-bold text-slate-800 dark:text-white">
+            Edit Content
+          </h2>
 
-          <p className="mt-2 text-slate-500">
+          <p className="mt-2 text-slate-500 dark:text-slate-300">
             Update the title of your saved content.
           </p>
         </div>
 
         {/* Input */}
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-600">
+          <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
             Title
           </label>
 

@@ -10,9 +10,7 @@ import Input from "./Input";
 
 interface CreateContentModelProps {
   open: boolean;
-
   onClose: () => void;
-
   refresh?: () => void;
 }
 
@@ -66,21 +64,25 @@ export default function CreateContentModel({
     /* Validation */
     if (!title) {
       toast.error("Title is required");
+
       return;
     }
 
     if (title.length < 3) {
       toast.error("Title must be at least 3 characters");
+
       return;
     }
 
     if (!link) {
       toast.error("Link is required");
+
       return;
     }
 
     if (!isValidUrl(link)) {
       toast.error("Please enter a valid URL");
+
       return;
     }
 
@@ -138,12 +140,14 @@ export default function CreateContentModel({
       <div className="absolute inset-0" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative z-10 w-full max-w-lg rounded-[32px] border border-slate-200 bg-white p-8 shadow-[0_30px_80px_rgba(0,0,0,0.2)]">
+      <div className="relative z-10 w-full max-w-lg rounded-[32px] border border-slate-200 bg-white p-8 shadow-[0_30px_80px_rgba(0,0,0,0.2)] transition-colors dark:border-slate-700 dark:bg-slate-800">
         {/* Header */}
         <div className="mb-7">
-          <h2 className="text-3xl font-bold text-slate-800">Add Content</h2>
+          <h2 className="text-3xl font-bold text-slate-800 dark:text-white">
+            Add Content
+          </h2>
 
-          <p className="mt-2 text-slate-500">
+          <p className="mt-2 text-slate-500 dark:text-slate-300">
             Save videos, tweets, and websites in your second brain.
           </p>
         </div>
@@ -151,7 +155,7 @@ export default function CreateContentModel({
         {/* Inputs */}
         <div className="space-y-5">
           <div>
-            <label className="mb-2 block text-sm font-medium text-slate-600">
+            <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
               Title
             </label>
 
@@ -159,7 +163,7 @@ export default function CreateContentModel({
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium text-slate-600">
+            <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
               Link
             </label>
 
@@ -167,7 +171,7 @@ export default function CreateContentModel({
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium text-slate-600">
+            <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
               Tags
             </label>
 
@@ -176,10 +180,10 @@ export default function CreateContentModel({
               value={tags}
               onChange={(e) => setTags(e.target.value)}
               placeholder="react, frontend, hooks"
-              className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-indigo-500"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition focus:border-indigo-500 dark:border-slate-600 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-400"
             />
 
-            <p className="mt-2 text-xs text-slate-400">
+            <p className="mt-2 text-xs text-slate-400 dark:text-slate-500">
               Separate tags using commas
             </p>
           </div>

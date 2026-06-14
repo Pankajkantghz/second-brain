@@ -151,25 +151,22 @@ const DashBoard = () => {
         collapsed={sidebarCollapsed}
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
       />
-
       {/* Create Modal */}
       <CreateContentModel
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         refresh={refresh}
       />
-
       {/* Edit Modal */}
+      ```tsx
       <EditContentModal
         open={editOpen}
         onClose={() => setEditOpen(false)}
         contentId={selectedContent.id}
         currentTitle={selectedContent.title}
-        currentLink={selectedContent.link}
-        currentTags={selectedContent.tags}
         refresh={refresh}
       />
-
+      ```
       {/* Main */}
       <main
         className={`min-h-screen px-6 py-6 transition-all duration-300 ${

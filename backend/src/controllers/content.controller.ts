@@ -103,7 +103,10 @@ export const getContentController = async (req: AuthRequest, res: Response) => {
 
 /* ---------------- Delete Content ---------------- */
 
-export const deleteContentController = async (req: AuthRequest, res: Response) => {
+export const deleteContentController = async (
+  req: AuthRequest,
+  res: Response,
+) => {
   try {
     const userId = req.userId;
 
@@ -135,7 +138,10 @@ export const deleteContentController = async (req: AuthRequest, res: Response) =
 
 /* ---------------- Update Content ---------------- */
 
-export const updateContentController = async (req: AuthRequest, res: Response) => {
+export const updateContentController = async (
+  req: AuthRequest,
+  res: Response,
+) => {
   try {
     const userId = req.userId;
 
@@ -159,15 +165,11 @@ export const updateContentController = async (req: AuthRequest, res: Response) =
       });
     }
 
-    const { contentId, title, link, tags } = validated.data;
+    const { contentId, title } = validated.data;
 
     await updateContent({
       contentId,
       title,
-      link,
-
-      tags: tags || [],
-
       userId,
     });
 

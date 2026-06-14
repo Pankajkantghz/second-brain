@@ -79,7 +79,7 @@ export default function Card({
     /* FIX: Added dynamic z-index (`menuOpen ? "z-40" : "z-10"`) to the card root. 
       When the menu is open, this specific card jumps above all other elements and cards on the page.
     */
-    <div 
+    <div
       className={`group relative overflow-visible rounded-[32px] border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${
         menuOpen ? "z-40" : "z-10"
       }`}
@@ -102,11 +102,14 @@ export default function Card({
       )}
 
       {/* Twitter */}
-      {type?.toLowerCase() === "twitter" && (
-        <div className="overflow-hidden rounded-t-[32px] bg-slate-50 p-5">
-          <blockquote className="twitter-tweet">
-            <a href={link.replace("x.com", "twitter.com")} />
-          </blockquote>
+
+      {type === "Twitter" && (
+        <div className="h-[250px] overflow-hidden rounded-t-[32px] bg-slate-50">
+          <div className="h-full overflow-y-auto p-4">
+            <blockquote className="twitter-tweet !m-0">
+              <a href={link.replace("x.com", "twitter.com")} />
+            </blockquote>
+          </div>
         </div>
       )}
 

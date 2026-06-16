@@ -33,12 +33,20 @@ export function Sidebar({
 }: SidebarProps) {
   const navigate = useNavigate();
 
+  /* Check Login Status */
+  const isLoggedIn = !!localStorage.getItem("token");
+
   /* Logout */
   const handleLogout = () => {
     localStorage.removeItem("token");
 
     toast.success("Logged out");
 
+    navigate("/signin");
+  };
+
+  /* Login */
+  const handleLogin = () => {
     navigate("/signin");
   };
 
@@ -197,16 +205,29 @@ export function Sidebar({
 
       {/* Footer */}
       <div className="border-t border-slate-100 p-4 dark:border-slate-700">
-        <button
-          onClick={handleLogout}
-          className={`flex items-center justify-center gap-2 rounded-2xl bg-red-500 text-white transition hover:bg-red-600 ${
-            collapsed ? "mx-auto h-14 w-14 rounded-xl" : "w-full px-4 py-3"
-          }`}
-        >
-          <LogoutIcon />
+        {isLoggedIn ? (
+          <button
+            onClick={handleLogout}
+            className={`flex items-center justify-center gap-2 rounded-2xl bg-red-500 text-white transition hover:bg-red-600 ${
+              collapsed ? "mx-auto h-14 w-14 rounded-xl" : "w-full px-4 py-3"
+            }`}
+          >
+            <LogoutIcon />
 
-          {!collapsed && <span className="font-medium">Logout</span>}
-        </button>
+            {!collapsed && <span className="font-medium">Logout</span>}
+          </button>
+        ) : (
+          <button
+            onClick={handleLogin}
+            className={`flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 text-white transition hover:bg-indigo-700 ${
+              collapsed ? "mx-auto h-14 w-14 rounded-xl" : "w-full px-4 py-3"
+            }`}
+          >
+            <span className="text-lg">🔐</span>
+
+            {!collapsed && <span className="font-medium">Login</span>}
+          </button>
+        )}
       </div>
     </aside>
   );

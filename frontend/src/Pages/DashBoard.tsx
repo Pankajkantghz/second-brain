@@ -3,8 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { AnimatePresence, motion } from "framer-motion";
 
-import { Sidebar } from "../components/Sidebar.tsx";
-
+import { Sidebar } from "../components/Sidebar";
 
 import CreateContentModel from "../components/CreateContentModel";
 import EditContentModal from "../components/EditContentModal";
@@ -24,6 +23,21 @@ import {
   fadeUpChild,
   contentTransition,
 } from "../animations";
+
+interface ContentItem {
+  _id: string;
+  title: string;
+  link: string;
+  type?: string;
+  tags?: string[];
+}
+
+interface SelectedContent {
+  id: string;
+  title: string;
+  link: string;
+  tags: string[];
+}
 
 const DashBoard = () => {
   /* =====================================================
@@ -51,22 +65,21 @@ const DashBoard = () => {
      SELECTED CONTENT
   ===================================================== */
 
-  const [selectedContent, setSelectedContent] = useState({
-    id: "",
-    title: "",
-    link: "",
-    tags: [] as string[],
-  });
+  const [selectedContent, setSelectedContent] =
+    useState<SelectedContent | null>(null);
 
   /* =====================================================
      CONTENT
   ===================================================== */
 
-  const { contents = [], refresh } = useContent() || {};
+  const contentResult = useContent();
+
+  const contents: ContentItem[] = contentResult?.contents ?? [];
+  const refresh = contentResult?.refresh;
 
   useEffect(() => {
     refresh?.();
-  }, []);
+  }, [refresh]);
 
   /* =====================================================
      STATS
@@ -80,9 +93,17 @@ const DashBoard = () => {
     contents.forEach((item) => {
       const type = item.type?.toLowerCase();
 
-      if (type === "youtube") youtube++;
-      if (type === "twitter") twitter++;
-      if (type === "website") website++;
+      if (type === "youtube") {
+        youtube++;
+      }
+
+      if (type === "twitter") {
+        twitter++;
+      }
+
+      if (type === "website") {
+        website++;
+      }
     });
 
     return {
@@ -101,9 +122,11 @@ const DashBoard = () => {
     const tagSet = new Set<string>();
 
     contents.forEach((item) => {
-      item.tags?.forEach((tag) => {
-        if (tag.trim()) {
-          tagSet.add(tag);
+      item.tags?.forEach((tag: string) => {
+        const trimmedTag = tag.trim();
+
+        if (trimmedTag) {
+          tagSet.add(trimmedTag);
         }
       });
     });
@@ -120,12 +143,9 @@ const DashBoard = () => {
       const type = item.type?.toLowerCase();
 
       const matchesType =
-        selectedType === "All" ||
-        type === selectedType.toLowerCase();
+        selectedType === "All" || type === selectedType.toLowerCase();
 
-      const matchesTag =
-        !selectedTag ||
-        item.tags?.includes(selectedTag);
+      const matchesTag = !selectedTag || item.tags?.includes(selectedTag);
 
       return matchesType && matchesTag;
     });
@@ -149,8 +169,7 @@ const DashBoard = () => {
         },
       );
 
-      const shareUrl =
-        `${window.location.origin}/share/${response.data.hash}`;
+      const shareUrl = `${window.location.origin}/share/${response.data.hash}`;
 
       await navigator.clipboard.writeText(shareUrl);
 
@@ -161,23 +180,19 @@ const DashBoard = () => {
   };
 
   /* =====================================================
-     DELETE
+     DELETE CONTENT
   ===================================================== */
 
   const handleDelete = async (contentId: string) => {
     try {
-      await axios.delete(
-        `${Backend_URL}/api/v1/content`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-
-          data: {
-            contentId,
-          },
+      await axios.delete(`${Backend_URL}/api/v1/content`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-      );
+        data: {
+          contentId,
+        },
+      });
 
       toast.success("Content deleted");
 
@@ -188,18 +203,39 @@ const DashBoard = () => {
   };
 
   /* =====================================================
-     EDIT
+     EDIT CONTENT
   ===================================================== */
 
-  const handleEdit = (content: any) => {
+  const handleEdit = (content: ContentItem) => {
     setSelectedContent({
       id: content._id,
       title: content.title,
       link: content.link,
-      tags: content.tags || [],
+      tags: content.tags ?? [],
     });
 
     setEditOpen(true);
+  };
+
+  /* =====================================================
+     MOBILE SIDEBAR
+  ===================================================== */
+
+  const handleMobileMenu = () => {
+    setMobileSidebarOpen(true);
+  };
+
+  const handleMobileClose = () => {
+    setMobileSidebarOpen(false);
+  };
+
+  /* =====================================================
+     CLEAR FILTERS
+  ===================================================== */
+
+  const handleClearFilters = () => {
+    setSelectedType("All");
+    setSelectedTag("");
   };
 
   /* =====================================================
@@ -229,17 +265,19 @@ const DashBoard = () => {
         selectedTag={selectedTag}
         onTagChange={setSelectedTag}
         collapsed={sidebarCollapsed}
-        onToggleCollapse={() =>
-          setSidebarCollapsed((prev) => !prev)
-        }
+        onToggleCollapse={() => setSidebarCollapsed((prev) => !prev)}
         mobileOpen={mobileSidebarOpen}
-        onMobileClose={() =>
-          setMobileSidebarOpen(false)
-        }
+        onMobileClose={handleMobileClose}
       />
 
       {/* =================================================
           CREATE MODAL
+
+          IMPORTANT:
+          CreateContentModel does NOT receive:
+          contentId
+          currentTitle
+          currentTags
       ================================================= */}
 
       <CreateContentModel
@@ -250,16 +288,22 @@ const DashBoard = () => {
 
       {/* =================================================
           EDIT MODAL
+
+          These props belong to EditContentModal.
       ================================================= */}
 
-      <EditContentModal
-        open={editOpen}
-        onClose={() => setEditOpen(false)}
-        contentId={selectedContent.id}
-        currentTitle={selectedContent.title}
-        currentTags={selectedContent.tags}
-        refresh={refresh}
-      />
+      {selectedContent && (
+        <EditContentModal
+          open={editOpen}
+          onClose={() => {
+            setEditOpen(false);
+            setSelectedContent(null);
+          }}
+          contentId={selectedContent.id}
+          currentTitle={selectedContent.title}
+          refresh={refresh}
+        />
+      )}
 
       {/* =================================================
           MAIN
@@ -276,28 +320,18 @@ const DashBoard = () => {
           sm:px-6
           sm:py-6
 
-          ${
-            sidebarCollapsed
-              ? "md:ml-24"
-              : "md:ml-72"
-          }
+          ${sidebarCollapsed ? "md:ml-24" : "md:ml-72"}
         `}
       >
         {/* =================================================
             HEADER
         ================================================= */}
 
-        <motion.div
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-        >
+        <motion.div variants={fadeUp} initial="hidden" animate="visible">
           <DashboardHeader
             onAdd={() => setModalOpen(true)}
             onShare={handleShare}
-            onMenu={() =>
-              setMobileSidebarOpen(true)
-            }
+            onMenu={handleMobileMenu}
           />
         </motion.div>
 
@@ -361,7 +395,7 @@ const DashBoard = () => {
                 </p>
               </div>
 
-              {/* Content count */}
+              {/* Content Count */}
 
               <motion.span
                 key={filteredContents.length}
@@ -386,9 +420,7 @@ const DashBoard = () => {
                   text-xs
                   font-semibold
                   text-slate-600
-
                   sm:inline-flex
-
                   dark:bg-slate-800
                   dark:text-slate-300
                 "
@@ -428,15 +460,14 @@ const DashBoard = () => {
                       <span
                         className="
                           rounded-full
-                          bg-indigo-50
+                          bg-slate-200
                           px-3
                           py-1
                           text-xs
                           font-medium
-                          text-indigo-600
-
-                          dark:bg-indigo-500/10
-                          dark:text-indigo-400
+                          text-slate-700
+                          dark:bg-slate-800
+                          dark:text-slate-200
                         "
                       >
                         {selectedType}
@@ -447,29 +478,23 @@ const DashBoard = () => {
                       <span
                         className="
                           rounded-full
-                          bg-indigo-50
+                          bg-slate-200
                           px-3
                           py-1
                           text-xs
                           font-medium
-                          text-indigo-600
-
-                          dark:bg-indigo-500/10
-                          dark:text-indigo-400
+                          text-slate-700
+                          dark:bg-slate-800
+                          dark:text-slate-200
                         "
                       >
                         #{selectedTag}
                       </span>
                     )}
 
-                    {/* Clear filters */}
-
                     <button
                       type="button"
-                      onClick={() => {
-                        setSelectedType("All");
-                        setSelectedTag("");
-                      }}
+                      onClick={handleClearFilters}
                       className="
                         rounded-full
                         px-3
@@ -480,7 +505,6 @@ const DashBoard = () => {
                         transition
                         hover:bg-slate-100
                         hover:text-slate-800
-
                         dark:text-slate-400
                         dark:hover:bg-slate-800
                         dark:hover:text-white
@@ -502,10 +526,19 @@ const DashBoard = () => {
             {filteredContents.length > 0 ? (
               <motion.div
                 key={`${selectedType}-${selectedTag}-content`}
-                variants={contentTransition}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
+                initial={{
+                  opacity: 0,
+                  y: 8,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                exit={{
+                  opacity: 0,
+                  y: -8,
+                }}
+                transition={contentTransition}
               >
                 <ContentGrid
                   contents={filteredContents}
@@ -516,14 +549,21 @@ const DashBoard = () => {
             ) : (
               <motion.div
                 key={`${selectedType}-${selectedTag}-empty`}
-                variants={contentTransition}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
+                initial={{
+                  opacity: 0,
+                  y: 8,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                exit={{
+                  opacity: 0,
+                  y: -8,
+                }}
+                transition={contentTransition}
               >
-                <EmptyState
-                  onAdd={() => setModalOpen(true)}
-                />
+                <EmptyState onAdd={() => setModalOpen(true)} />
               </motion.div>
             )}
           </AnimatePresence>

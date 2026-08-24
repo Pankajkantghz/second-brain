@@ -32,6 +32,10 @@ interface SidebarProps {
 
   collapsed: boolean;
   onToggleCollapse: () => void;
+
+  // Mobile sidebar
+  mobileOpen: boolean;
+  onMobileClose: () => void;
 }
 
 export function Sidebar({

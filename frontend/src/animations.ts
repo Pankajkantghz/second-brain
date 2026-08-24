@@ -1,14 +1,9 @@
 import type { Transition, Variants } from "framer-motion";
 
-/* =====================================================
-   PAGE
-===================================================== */
-
 export const pageVariants: Variants = {
   hidden: {
     opacity: 0,
   },
-
   visible: {
     opacity: 1,
     transition: {
@@ -18,16 +13,11 @@ export const pageVariants: Variants = {
   },
 };
 
-/* =====================================================
-   FADE UP
-===================================================== */
-
 export const fadeUp: Variants = {
   hidden: {
     opacity: 0,
     y: 12,
   },
-
   visible: {
     opacity: 1,
     y: 0,
@@ -38,16 +28,11 @@ export const fadeUp: Variants = {
   },
 };
 
-/* =====================================================
-   FADE UP CHILD
-===================================================== */
-
 export const fadeUpChild: Variants = {
   hidden: {
     opacity: 0,
     y: 10,
   },
-
   visible: {
     opacity: 1,
     y: 0,
@@ -58,13 +43,8 @@ export const fadeUpChild: Variants = {
   },
 };
 
-/* =====================================================
-   STAGGER CONTAINER
-===================================================== */
-
 export const staggerContainer: Variants = {
   hidden: {},
-
   visible: {
     transition: {
       staggerChildren: 0.07,
@@ -72,16 +52,11 @@ export const staggerContainer: Variants = {
   },
 };
 
-/* =====================================================
-   CARD FADE UP
-===================================================== */
-
 export const cardFadeUp: Variants = {
   hidden: {
     opacity: 0,
     y: 12,
   },
-
   visible: {
     opacity: 1,
     y: 0,
@@ -92,16 +67,11 @@ export const cardFadeUp: Variants = {
   },
 };
 
-/* =====================================================
-   SCALE FADE
-===================================================== */
-
 export const scaleFade: Variants = {
   hidden: {
     opacity: 0,
     scale: 0.96,
   },
-
   visible: {
     opacity: 1,
     scale: 1,
@@ -112,12 +82,19 @@ export const scaleFade: Variants = {
   },
 };
 
-/* =====================================================
-   CONTENT TRANSITION
-   This is a Transition, NOT Variants.
-===================================================== */
-
 export const contentTransition: Transition = {
   duration: 0.35,
   ease: "easeOut",
+};
+
+export const contentVariants: Variants = {
+  hidden: {
+    opacity: 0,
+    y: 10,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: contentTransition,
+  },
 };

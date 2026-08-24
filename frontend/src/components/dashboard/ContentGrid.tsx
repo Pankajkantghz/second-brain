@@ -1,17 +1,10 @@
+import type { ContentItem } from "../../types/content";
 import Card from "../Card";
 
-interface Content {
-  _id: string;
-  title: string;
-  link: string;
-  type: "Twitter" | "Youtube" | "Website" | string;
-  tags?: string[];
-}
-
 interface ContentGridProps {
-  contents: Content[];
+  contents: ContentItem[];
   onDelete: (contentId: string) => void;
-  onEdit: (content: Content) => void;
+  onEdit: (content: ContentItem) => void;
 }
 
 export default function ContentGrid({
@@ -29,13 +22,10 @@ export default function ContentGrid({
         grid
         grid-cols-1
         gap-4
-
         sm:grid-cols-2
         sm:gap-5
-
         lg:grid-cols-3
         lg:gap-6
-
         2xl:grid-cols-4
       "
     >
@@ -44,7 +34,7 @@ export default function ContentGrid({
           key={item._id}
           title={item.title}
           link={item.link}
-          type={item.type}
+          type={item.type ?? "Website"}
           tags={item.tags ?? []}
           onDelete={() => onDelete(item._id)}
           onEdit={() => onEdit(item)}

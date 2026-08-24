@@ -10,9 +10,13 @@ import Input from "./Input";
 interface CreateContentModelProps {
   open: boolean;
   onClose: () => void;
-  refresh?: () => void;
-}
 
+  contentId?: string;
+  currentTitle?: string;
+  currentTags?: string[];
+
+  refresh?: () => Promise<void>;
+}
 const isValidUrl = (url: string) => {
   try {
     const parsed = new URL(url);

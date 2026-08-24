@@ -1,11 +1,9 @@
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
-import ThemeToggle from "../components/ThemeToggle";
-
 import { Link, useNavigate } from "react-router-dom";
-
 import { toast } from "react-toastify";
 
+import ThemeToggle from "../components/ThemeToggle";
 import { Button } from "../components/Button";
 import Input from "../components/Input";
 
@@ -13,7 +11,6 @@ import { Backend_URL } from "../config";
 
 export default function Signin() {
   const emailRef = useRef<HTMLInputElement>(null);
-
   const passwordRef = useRef<HTMLInputElement>(null);
 
   const navigate = useNavigate();
@@ -31,48 +28,55 @@ export default function Signin() {
 
   const signin = async () => {
     const email = emailRef.current?.value.trim() || "";
-
     const password = passwordRef.current?.value || "";
 
     /* Validation */
     if (!email) {
       toast.error("Email is required");
-
       return;
     }
 
     if (!password) {
       toast.error("Password is required");
-
       return;
     }
 
     try {
       setLoading(true);
 
-      const response = await axios.post(`${Backend_URL}/api/v1/signin`, {
-        email,
-        password,
-      });
+      const response = await axios.post(
+        `${Backend_URL}/api/v1/signin`,
+        {
+          email,
+          password,
+        },
+      );
 
       localStorage.setItem("token", response.data.token);
 
       toast.success("Welcome back 👋");
 
       navigate("/dashboard");
-    } catch (error: any) {
-      const message = error.response?.data?.message || "Login failed";
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        const message =
+          error.response?.data?.message || "Login failed";
 
-      toast.error(message);
+        toast.error(message);
+      } else {
+        toast.error("Login failed");
+      }
 
-      console.log(error);
+      console.error(error);
     } finally {
       setLoading(false);
     }
   };
 
   /* Enter Key */
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
     if (e.key === "Enter") {
       signin();
     }
@@ -85,6 +89,7 @@ export default function Signin() {
         <ThemeToggle />
       </div>
 
+      {/* Card */}
       <div className="w-full max-w-md rounded-[36px] border border-slate-100 bg-white p-8 shadow-[0_20px_60px_rgba(0,0,0,0.08)] transition-colors dark:border-slate-700 dark:bg-slate-800">
         {/* Header */}
         <div className="mb-8 text-center">
@@ -99,14 +104,21 @@ export default function Signin() {
 
         {/* Inputs */}
         <div className="space-y-5">
+          {/* Email */}
           <div>
             <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
               Email
             </label>
 
-            <Input ref={emailRef} placeholder="john@email.com" />
+            <Input
+              ref={emailRef}
+              type="email"
+              placeholder="john@email.com"
+              autoComplete="email"
+            />
           </div>
 
+          {/* Password */}
           <div>
             <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
               Password
@@ -116,6 +128,7 @@ export default function Signin() {
               ref={passwordRef}
               type="password"
               placeholder="Enter password"
+              autoComplete="current-password"
               onKeyDown={handleKeyDown}
             />
           </div>
@@ -137,7 +150,7 @@ export default function Signin() {
           Don’t have an account?{" "}
           <Link
             to="/signup"
-            className="font-semibold text-indigo-600 transition hover:text-indigo-700 hover:underline"
+            className="font-semibold text-indigo-600 transition hover:text-indigo-700 hover:underline dark:text-indigo-400 dark:hover:text-indigo-300"
           >
             Create Account
           </Link>

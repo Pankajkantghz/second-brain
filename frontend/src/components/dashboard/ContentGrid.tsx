@@ -5,15 +5,12 @@ interface Content {
   title: string;
   link: string;
   type: "Twitter" | "Youtube" | "Website" | string;
-
   tags?: string[];
 }
 
 interface ContentGridProps {
   contents: Content[];
-
   onDelete: (contentId: string) => void;
-
   onEdit: (content: Content) => void;
 }
 
@@ -22,7 +19,7 @@ export default function ContentGrid({
   onDelete,
   onEdit,
 }: ContentGridProps) {
-  if (!contents || contents.length === 0) {
+  if (contents.length === 0) {
     return null;
   }
 
@@ -31,10 +28,14 @@ export default function ContentGrid({
       className="
         grid
         grid-cols-1
-        gap-6
-        sm:grid-cols-1
-        md:grid-cols-2
-        xl:grid-cols-3
+        gap-4
+
+        sm:grid-cols-2
+        sm:gap-5
+
+        lg:grid-cols-3
+        lg:gap-6
+
         2xl:grid-cols-4
       "
     >
@@ -44,7 +45,7 @@ export default function ContentGrid({
           title={item.title}
           link={item.link}
           type={item.type}
-          tags={item.tags || []}
+          tags={item.tags ?? []}
           onDelete={() => onDelete(item._id)}
           onEdit={() => onEdit(item)}
         />

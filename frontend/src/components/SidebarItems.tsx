@@ -1,6 +1,9 @@
+import type { ReactNode } from "react";
+import { motion } from "framer-motion";
+
 interface SidebarItemsProps {
   text: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   active?: boolean;
   collapsed: boolean;
   onClick?: () => void;
@@ -14,37 +17,158 @@ export default function SidebarItems({
   onClick,
 }: SidebarItemsProps) {
   return (
-    <button
+    <motion.button
+      type="button"
       onClick={onClick}
-      title={collapsed ? text : ""}
-      className={`group relative flex w-full items-center rounded-2xl transition-all duration-300 ${
-        collapsed ? "justify-center px-2 py-3" : "justify-start gap-4 px-4 py-3"
-      } ${
-        active
-          ? "bg-indigo-50 text-indigo-700 shadow-sm dark:bg-indigo-900/30 dark:text-indigo-300"
-          : "text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
-      }`}
+      title={collapsed ? text : undefined}
+      aria-current={active ? "page" : undefined}
+      whileHover={{ x: collapsed ? 0 : 2 }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ duration: 0.15 }}
+      className={`
+        group
+        relative
+        flex
+        w-full
+        items-center
+        rounded-xl
+        outline-none
+        transition-colors
+        duration-200
+
+        ${
+          collapsed
+            ? "justify-center px-2 py-2.5"
+            : "justify-start gap-3 px-3 py-2.5"
+        }
+
+        ${
+          active
+            ? `
+              bg-slate-100
+              text-slate-900
+
+              dark:bg-slate-800
+              dark:text-white
+            `
+            : `
+              text-slate-500
+              hover:bg-slate-50
+              hover:text-slate-900
+
+              dark:text-slate-400
+              dark:hover:bg-slate-800/60
+              dark:hover:text-slate-100
+            `
+        }
+
+        focus-visible:ring-2
+        focus-visible:ring-slate-400/40
+      `}
     >
-      {/* Active Indicator */}
+      {/* Active indicator */}
+
       {active && (
-        <div className="absolute left-0 top-1/2 h-8 w-1 -translate-y-1/2 rounded-r-full bg-indigo-600" />
+        <motion.span
+          layoutId="sidebar-active"
+          transition={{
+            type: "spring",
+            stiffness: 500,
+            damping: 35,
+          }}
+          className="
+            absolute
+            left-0
+            top-1/2
+            h-5
+            w-[3px]
+            -translate-y-1/2
+            rounded-r-full
+            bg-slate-900
+
+            dark:bg-white
+          "
+        />
       )}
 
       {/* Icon */}
-      <div
-        className={`flex shrink-0 items-center justify-center rounded-xl transition-all duration-200 ${
-          collapsed ? "h-12 w-12" : "h-10 w-10"
-        } ${
-          active
-            ? "bg-indigo-100 dark:bg-indigo-900/40"
-            : "group-hover:bg-slate-100 dark:group-hover:bg-slate-700"
-        }`}
+
+      <motion.span
+        animate={{
+          scale: active ? 1 : 0.98,
+        }}
+        whileHover={{
+          scale: 1.06,
+        }}
+        transition={{
+          duration: 0.15,
+        }}
+        className={`
+          flex
+          shrink-0
+          items-center
+          justify-center
+          rounded-lg
+
+          ${
+            collapsed
+              ? "h-10 w-10"
+              : "h-9 w-9"
+          }
+
+          ${
+            active
+              ? `
+                bg-white
+                text-slate-900
+                shadow-sm
+
+                dark:bg-slate-700
+                dark:text-white
+              `
+              : `
+                text-slate-500
+
+                group-hover:bg-slate-100
+                group-hover:text-slate-800
+
+                dark:text-slate-400
+                dark:group-hover:bg-slate-700
+                dark:group-hover:text-slate-100
+              `
+          }
+        `}
       >
-        <span className="text-lg">{icon}</span>
-      </div>
+        <span className="text-[17px]">
+          {icon}
+        </span>
+      </motion.span>
 
       {/* Text */}
-      {!collapsed && <span className="truncate font-medium">{text}</span>}
-    </button>
+
+      {!collapsed && (
+        <motion.span
+          initial={{
+            opacity: 0,
+            x: -4,
+          }}
+          animate={{
+            opacity: 1,
+            x: 0,
+          }}
+          transition={{
+            duration: 0.15,
+          }}
+          className="
+            min-w-0
+            truncate
+            text-sm
+            font-medium
+          "
+        >
+          {text}
+        </motion.span>
+      )}
+    </motion.button>
   );
 }

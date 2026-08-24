@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-
 import axios from "axios";
 import { toast } from "react-toastify";
+import { AnimatePresence, motion } from "framer-motion";
 
-import { Sidebar } from "../components/Sidebar";
+import { Sidebar } from "../components/Sidebar.tsx";
+
 
 import CreateContentModel from "../components/CreateContentModel";
 import EditContentModal from "../components/EditContentModal";
@@ -14,24 +15,42 @@ import ContentGrid from "../components/dashboard/ContentGrid";
 import EmptyState from "../components/dashboard/EmptyState";
 
 import useContent from "../hooks/useContent";
-
 import { Backend_URL } from "../config";
 
+import {
+  pageVariants,
+  fadeUp,
+  staggerContainer,
+  fadeUpChild,
+  contentTransition,
+} from "../animations";
+
 const DashBoard = () => {
-  /* Sidebar */
+  /* =====================================================
+     SIDEBAR
+  ===================================================== */
+
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-  /* Modals */
+  /* =====================================================
+     MODALS
+  ===================================================== */
+
   const [modalOpen, setModalOpen] = useState(false);
-
   const [editOpen, setEditOpen] = useState(false);
 
-  /* Filters */
-  const [selectedType, setSelectedType] = useState("All");
+  /* =====================================================
+     FILTERS
+  ===================================================== */
 
+  const [selectedType, setSelectedType] = useState("All");
   const [selectedTag, setSelectedTag] = useState("");
 
-  /* Selected Content */
+  /* =====================================================
+     SELECTED CONTENT
+  ===================================================== */
+
   const [selectedContent, setSelectedContent] = useState({
     id: "",
     title: "",
@@ -39,49 +58,83 @@ const DashBoard = () => {
     tags: [] as string[],
   });
 
-  /* Content Hook */
+  /* =====================================================
+     CONTENT
+  ===================================================== */
+
   const { contents = [], refresh } = useContent() || {};
 
-  /* Initial Fetch */
   useEffect(() => {
     refresh?.();
   }, []);
 
-  /* Stats */
+  /* =====================================================
+     STATS
+  ===================================================== */
+
   const stats = useMemo(() => {
+    let youtube = 0;
+    let twitter = 0;
+    let website = 0;
+
+    contents.forEach((item) => {
+      const type = item.type?.toLowerCase();
+
+      if (type === "youtube") youtube++;
+      if (type === "twitter") twitter++;
+      if (type === "website") website++;
+    });
+
     return {
       total: contents.length,
-
-      youtube: contents.filter((item) => item.type?.toLowerCase() === "youtube")
-        .length,
-
-      twitter: contents.filter((item) => item.type?.toLowerCase() === "twitter")
-        .length,
-
-      website: contents.filter((item) => item.type?.toLowerCase() === "website")
-        .length,
+      youtube,
+      twitter,
+      website,
     };
   }, [contents]);
 
-  /* Tags */
+  /* =====================================================
+     TAGS
+  ===================================================== */
+
   const allTags = useMemo(() => {
-    return [...new Set(contents.flatMap((item) => item.tags || []))];
+    const tagSet = new Set<string>();
+
+    contents.forEach((item) => {
+      item.tags?.forEach((tag) => {
+        if (tag.trim()) {
+          tagSet.add(tag);
+        }
+      });
+    });
+
+    return Array.from(tagSet).sort();
   }, [contents]);
 
-  /* Filter Content */
+  /* =====================================================
+     FILTER CONTENT
+  ===================================================== */
+
   const filteredContents = useMemo(() => {
     return contents.filter((item) => {
+      const type = item.type?.toLowerCase();
+
       const matchesType =
         selectedType === "All" ||
-        item.type?.toLowerCase() === selectedType.toLowerCase();
+        type === selectedType.toLowerCase();
 
-      const matchesTag = !selectedTag || item.tags?.includes(selectedTag);
+      const matchesTag =
+        !selectedTag ||
+        item.tags?.includes(selectedTag);
 
       return matchesType && matchesTag;
     });
   }, [contents, selectedType, selectedTag]);
 
-  /* Share Brain */
+  /* =====================================================
+     SHARE BRAIN
+  ===================================================== */
+
   const handleShare = async () => {
     try {
       const response = await axios.post(
@@ -96,7 +149,8 @@ const DashBoard = () => {
         },
       );
 
-      const shareUrl = `${window.location.origin}/share/${response.data.hash}`;
+      const shareUrl =
+        `${window.location.origin}/share/${response.data.hash}`;
 
       await navigator.clipboard.writeText(shareUrl);
 
@@ -106,18 +160,24 @@ const DashBoard = () => {
     }
   };
 
-  /* Delete Content */
+  /* =====================================================
+     DELETE
+  ===================================================== */
+
   const handleDelete = async (contentId: string) => {
     try {
-      await axios.delete(`${Backend_URL}/api/v1/content`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+      await axios.delete(
+        `${Backend_URL}/api/v1/content`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
 
-        data: {
-          contentId,
+          data: {
+            contentId,
+          },
         },
-      });
+      );
 
       toast.success("Content deleted");
 
@@ -127,7 +187,10 @@ const DashBoard = () => {
     }
   };
 
-  /* Edit Content */
+  /* =====================================================
+     EDIT
+  ===================================================== */
+
   const handleEdit = (content: any) => {
     setSelectedContent({
       id: content._id,
@@ -139,9 +202,26 @@ const DashBoard = () => {
     setEditOpen(true);
   };
 
+  /* =====================================================
+     RENDER
+  ===================================================== */
+
   return (
-    <div className="min-h-screen bg-slate-100 transition-colors dark:bg-slate-900">
-      {/* Sidebar */}
+    <motion.div
+      variants={pageVariants}
+      initial="hidden"
+      animate="visible"
+      className="
+        min-h-screen
+        bg-slate-100
+        transition-colors
+        dark:bg-slate-950
+      "
+    >
+      {/* =================================================
+          SIDEBAR
+      ================================================= */}
+
       <Sidebar
         tags={allTags}
         selectedType={selectedType}
@@ -149,69 +229,307 @@ const DashBoard = () => {
         selectedTag={selectedTag}
         onTagChange={setSelectedTag}
         collapsed={sidebarCollapsed}
-        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        onToggleCollapse={() =>
+          setSidebarCollapsed((prev) => !prev)
+        }
+        mobileOpen={mobileSidebarOpen}
+        onMobileClose={() =>
+          setMobileSidebarOpen(false)
+        }
       />
 
-      {/* Create Modal */}
+      {/* =================================================
+          CREATE MODAL
+      ================================================= */}
+
       <CreateContentModel
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         refresh={refresh}
       />
 
-      {/* Edit Modal */}
+      {/* =================================================
+          EDIT MODAL
+      ================================================= */}
+
       <EditContentModal
         open={editOpen}
         onClose={() => setEditOpen(false)}
         contentId={selectedContent.id}
         currentTitle={selectedContent.title}
+        currentTags={selectedContent.tags}
         refresh={refresh}
       />
 
-      {/* Main */}
+      {/* =================================================
+          MAIN
+      ================================================= */}
+
       <main
-        className={`min-h-screen px-6 py-6 transition-all duration-300 ${
-          sidebarCollapsed ? "ml-24" : "ml-72"
-        }`}
+        className={`
+          min-h-screen
+          px-4
+          py-5
+          transition-[margin]
+          duration-300
+
+          sm:px-6
+          sm:py-6
+
+          ${
+            sidebarCollapsed
+              ? "md:ml-24"
+              : "md:ml-72"
+          }
+        `}
       >
-        {/* Header */}
-        <DashboardHeader
-          onAdd={() => setModalOpen(true)}
-          onShare={handleShare}
-        />
+        {/* =================================================
+            HEADER
+        ================================================= */}
 
-        {/* Stats */}
-        <DashboardStats
-          total={stats.total}
-          youtubeCount={stats.youtube}
-          twitterCount={stats.twitter}
-          websiteCount={stats.website}
-        />
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+        >
+          <DashboardHeader
+            onAdd={() => setModalOpen(true)}
+            onShare={handleShare}
+            onMenu={() =>
+              setMobileSidebarOpen(true)
+            }
+          />
+        </motion.div>
 
-        {/* Content */}
-        <section className="mt-8">
+        {/* =================================================
+            STATS
+        ================================================= */}
+
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+          className="mt-1"
+        >
+          <motion.div variants={fadeUpChild}>
+            <DashboardStats
+              total={stats.total}
+              youtubeCount={stats.youtube}
+              twitterCount={stats.twitter}
+              websiteCount={stats.website}
+              onSelect={setSelectedType}
+            />
+          </motion.div>
+        </motion.div>
+
+        {/* =================================================
+            SAVED CONTENT
+        ================================================= */}
+
+        <motion.section
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          className="mt-8"
+        >
+          {/* Section Header */}
+
           <div className="mb-6">
-            <h2 className="text-2xl font-bold text-slate-800 dark:text-white">
-              Saved Content
-            </h2>
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <h2
+                  className="
+                    text-2xl
+                    font-bold
+                    tracking-tight
+                    text-slate-900
+                    dark:text-white
+                  "
+                >
+                  Saved Content
+                </h2>
 
-            <p className="mt-1 text-slate-500 dark:text-slate-300">
-              Your saved knowledge, links, and resources.
-            </p>
+                <p
+                  className="
+                    mt-1
+                    text-sm
+                    text-slate-500
+                    dark:text-slate-400
+                  "
+                >
+                  Your saved knowledge, links, and resources.
+                </p>
+              </div>
+
+              {/* Content count */}
+
+              <motion.span
+                key={filteredContents.length}
+                initial={{
+                  opacity: 0,
+                  scale: 0.85,
+                }}
+                animate={{
+                  opacity: 1,
+                  scale: 1,
+                }}
+                transition={{
+                  duration: 0.25,
+                  ease: "easeOut",
+                }}
+                className="
+                  hidden
+                  rounded-full
+                  bg-slate-200
+                  px-3
+                  py-1
+                  text-xs
+                  font-semibold
+                  text-slate-600
+
+                  sm:inline-flex
+
+                  dark:bg-slate-800
+                  dark:text-slate-300
+                "
+              >
+                {filteredContents.length}
+              </motion.span>
+            </div>
+
+            {/* Active Filters */}
+
+            <AnimatePresence mode="popLayout">
+              {(selectedType !== "All" || selectedTag) && (
+                <motion.div
+                  initial={{
+                    opacity: 0,
+                    height: 0,
+                    marginTop: 0,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    height: "auto",
+                    marginTop: 12,
+                  }}
+                  exit={{
+                    opacity: 0,
+                    height: 0,
+                    marginTop: 0,
+                  }}
+                  transition={{
+                    duration: 0.25,
+                    ease: "easeOut",
+                  }}
+                  className="overflow-hidden"
+                >
+                  <div className="flex flex-wrap items-center gap-2">
+                    {selectedType !== "All" && (
+                      <span
+                        className="
+                          rounded-full
+                          bg-indigo-50
+                          px-3
+                          py-1
+                          text-xs
+                          font-medium
+                          text-indigo-600
+
+                          dark:bg-indigo-500/10
+                          dark:text-indigo-400
+                        "
+                      >
+                        {selectedType}
+                      </span>
+                    )}
+
+                    {selectedTag && (
+                      <span
+                        className="
+                          rounded-full
+                          bg-indigo-50
+                          px-3
+                          py-1
+                          text-xs
+                          font-medium
+                          text-indigo-600
+
+                          dark:bg-indigo-500/10
+                          dark:text-indigo-400
+                        "
+                      >
+                        #{selectedTag}
+                      </span>
+                    )}
+
+                    {/* Clear filters */}
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedType("All");
+                        setSelectedTag("");
+                      }}
+                      className="
+                        rounded-full
+                        px-3
+                        py-1
+                        text-xs
+                        font-medium
+                        text-slate-500
+                        transition
+                        hover:bg-slate-100
+                        hover:text-slate-800
+
+                        dark:text-slate-400
+                        dark:hover:bg-slate-800
+                        dark:hover:text-white
+                      "
+                    >
+                      Clear filters
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
-          {filteredContents.length > 0 ? (
-            <ContentGrid
-              contents={filteredContents}
-              onDelete={handleDelete}
-              onEdit={handleEdit}
-            />
-          ) : (
-            <EmptyState onAdd={() => setModalOpen(true)} />
-          )}
-        </section>
+          {/* =================================================
+              CONTENT / EMPTY STATE
+          ================================================= */}
+
+          <AnimatePresence mode="wait">
+            {filteredContents.length > 0 ? (
+              <motion.div
+                key={`${selectedType}-${selectedTag}-content`}
+                variants={contentTransition}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+              >
+                <ContentGrid
+                  contents={filteredContents}
+                  onDelete={handleDelete}
+                  onEdit={handleEdit}
+                />
+              </motion.div>
+            ) : (
+              <motion.div
+                key={`${selectedType}-${selectedTag}-empty`}
+                variants={contentTransition}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+              >
+                <EmptyState
+                  onAdd={() => setModalOpen(true)}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.section>
       </main>
-    </div>
+    </motion.div>
   );
 };
 

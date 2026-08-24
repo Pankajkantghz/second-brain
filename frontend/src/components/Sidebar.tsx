@@ -1,10 +1,22 @@
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
+import {
+  FiChevronLeft,
+  FiGlobe,
+  FiLayers,
+  FiLogIn,
+  FiLogOut,
+  FiMenu,
+  FiTag,
+  FiX,
+  FiYoutube,
+} from "react-icons/fi";
+import { FaXTwitter } from "react-icons/fa6";
+
 import BrainIcon from "../icons/BrainIcon";
-import LogoutIcon from "../icons/LogoutIcon";
-import XIcon from "../icons/XIcon";
-import YoutubeIcons from "../icons/YoutubeIcons";
 
 import SidebarItems from "./SidebarItems";
 import ThemeToggle from "./ThemeToggle";
@@ -33,202 +45,633 @@ export function Sidebar({
 }: SidebarProps) {
   const navigate = useNavigate();
 
-  /* Check Login Status */
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   const isLoggedIn = !!localStorage.getItem("token");
 
-  /* Logout */
+  /* -------------------------------------------------------
+     LOGOUT
+  ------------------------------------------------------- */
+
   const handleLogout = () => {
     localStorage.removeItem("token");
 
     toast.success("Logged out");
 
+    setMobileOpen(false);
+
     navigate("/signin");
   };
 
-  /* Login */
+  /* -------------------------------------------------------
+     LOGIN
+  ------------------------------------------------------- */
+
   const handleLogin = () => {
+    setMobileOpen(false);
+
     navigate("/signin");
+  };
+
+  /* -------------------------------------------------------
+     SELECT TYPE
+  ------------------------------------------------------- */
+
+  const handleTypeChange = (type: string) => {
+    onTypeChange(type);
+    setMobileOpen(false);
+  };
+
+  /* -------------------------------------------------------
+     SELECT TAG
+  ------------------------------------------------------- */
+
+  const handleTagChange = (tag: string) => {
+    onTagChange(tag);
+    setMobileOpen(false);
   };
 
   return (
-    <aside
-      className={`fixed left-0 top-0 z-50 flex h-screen flex-col border-r border-slate-200 bg-white shadow-sm transition-all duration-300 dark:border-slate-700 dark:bg-slate-900 ${
-        collapsed ? "w-24" : "w-72"
-      }`}
-    >
-      {/* Header */}
-      <div className="border-b border-slate-100 p-5 dark:border-slate-700">
-        <div className="relative flex items-center">
-          {/* Logo */}
-          <div
-            className={`flex items-center overflow-hidden ${
-              collapsed ? "w-full justify-center" : "gap-4"
-            }`}
+    <>
+      {/* =====================================================
+          MOBILE HAMBURGER
+      ====================================================== */}
+
+      <AnimatePresence>
+        {!mobileOpen && (
+          <motion.button
+            type="button"
+            aria-label="Open sidebar"
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.85 }}
+            whileTap={{ scale: 0.92 }}
+            onClick={() => setMobileOpen(true)}
+            className="
+              fixed
+              left-4
+              top-4
+              z-[60]
+              flex
+              h-11
+              w-11
+              items-center
+              justify-center
+              rounded-xl
+              border
+              border-slate-200
+              bg-white
+              text-slate-700
+              shadow-lg
+              shadow-slate-900/5
+
+              dark:border-slate-700
+              dark:bg-slate-900
+              dark:text-slate-200
+
+              md:hidden
+            "
           >
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md">
+            <FiMenu className="h-5 w-5" />
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* =====================================================
+          MOBILE OVERLAY
+      ====================================================== */}
+
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setMobileOpen(false)}
+            className="
+              fixed
+              inset-0
+              z-40
+              bg-black/30
+              backdrop-blur-[2px]
+
+              md:hidden
+            "
+          />
+        )}
+      </AnimatePresence>
+
+      {/* =====================================================
+          SIDEBAR
+      ====================================================== */}
+
+      <motion.aside
+        initial={false}
+        animate={{
+          width: collapsed ? 88 : 288,
+        }}
+        transition={{
+          duration: 0.3,
+          ease: [0.4, 0, 0.2, 1],
+        }}
+        className={`
+          fixed
+          left-0
+          top-0
+          z-50
+          flex
+          h-screen
+          flex-col
+
+          border-r
+          border-slate-200
+          bg-white
+
+          shadow-[4px_0_24px_rgba(0,0,0,0.04)]
+
+          dark:border-slate-800
+          dark:bg-slate-950
+
+          /* Mobile */
+          w-[min(86vw,320px)]
+          -translate-x-full
+
+          ${
+            mobileOpen
+              ? "translate-x-0"
+              : ""
+          }
+
+          /* Desktop */
+          md:translate-x-0
+        `}
+      >
+        {/* ===================================================
+            HEADER
+        ==================================================== */}
+
+        <div
+          className="
+            relative
+            shrink-0
+            border-b
+            border-slate-100
+            px-4
+            py-4
+
+            dark:border-slate-800
+          "
+        >
+          <div
+            className={`
+              flex
+              items-center
+
+              ${
+                collapsed
+                  ? "justify-center"
+                  : "gap-3"
+              }
+            `}
+          >
+            {/* Logo */}
+
+            <motion.div
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
+              className="
+                flex
+                h-11
+                w-11
+                shrink-0
+                items-center
+                justify-center
+                rounded-xl
+                bg-slate-900
+                text-white
+                shadow-sm
+
+                dark:bg-white
+                dark:text-slate-900
+              "
+            >
               <BrainIcon />
-            </div>
+            </motion.div>
 
-            {!collapsed && (
-              <div className="min-w-0">
-                <h1 className="truncate text-2xl font-bold text-slate-800 dark:text-white">
-                  Brainly
-                </h1>
+            {/* Brand */}
 
-                <p className="text-sm text-slate-500 dark:text-slate-300">
-                  Your second brain
-                </p>
-              </div>
-            )}
+            <AnimatePresence initial={false}>
+              {!collapsed && (
+                <motion.div
+                  initial={{
+                    opacity: 0,
+                    width: 0,
+                    x: -8,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    width: "auto",
+                    x: 0,
+                  }}
+                  exit={{
+                    opacity: 0,
+                    width: 0,
+                    x: -8,
+                  }}
+                  transition={{ duration: 0.2 }}
+                  className="min-w-0 overflow-hidden"
+                >
+                  <h1 className="truncate text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+                    SecondBrain
+                  </h1>
+
+                  <p className="truncate text-[11px] text-slate-400 dark:text-slate-500">
+                    Your second brain
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Mobile Close */}
+
+            <motion.button
+              type="button"
+              aria-label="Close sidebar"
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setMobileOpen(false)}
+              className="
+                ml-auto
+                flex
+                h-9
+                w-9
+                items-center
+                justify-center
+                rounded-lg
+                text-slate-500
+                hover:bg-slate-100
+                hover:text-slate-900
+
+                dark:text-slate-400
+                dark:hover:bg-slate-800
+                dark:hover:text-white
+
+                md:hidden
+              "
+            >
+              <FiX className="h-5 w-5" />
+            </motion.button>
           </div>
 
-          {/* Collapse Button */}
-          <button
+          {/* Desktop Collapse */}
+
+          <motion.button
+            type="button"
+            aria-label={
+              collapsed
+                ? "Expand sidebar"
+                : "Collapse sidebar"
+            }
+            whileTap={{ scale: 0.9 }}
             onClick={onToggleCollapse}
-            className={`absolute top-1/2 -translate-y-1/2 rounded-xl border border-slate-200 bg-white p-2 text-slate-500 shadow-sm transition hover:bg-slate-50 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white ${
-              collapsed ? "-right-4" : "right-0"
-            }`}
+            className="
+              absolute
+              -right-3
+              top-1/2
+              hidden
+              h-7
+              w-7
+              -translate-y-1/2
+              items-center
+              justify-center
+              rounded-full
+              border
+              border-slate-200
+              bg-white
+              text-slate-500
+              shadow-sm
+              transition-colors
+
+              hover:bg-slate-50
+              hover:text-slate-900
+
+              dark:border-slate-700
+              dark:bg-slate-900
+              dark:text-slate-400
+              dark:hover:bg-slate-800
+              dark:hover:text-white
+
+              md:flex
+            "
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2.5}
-              stroke="currentColor"
-              className={`h-4 w-4 transition-transform duration-300 ${
-                collapsed ? "rotate-180" : ""
-              }`}
+            <motion.div
+              animate={{
+                rotate: collapsed ? 180 : 0,
+              }}
+              transition={{ duration: 0.25 }}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15.75 19.5L8.25 12l7.5-7.5"
-              />
-            </svg>
-          </button>
+              <FiChevronLeft className="h-4 w-4" />
+            </motion.div>
+          </motion.button>
         </div>
 
-        {/* Theme Toggle */}
-        {!collapsed && (
-          <div className="mt-4 flex justify-end">
+        {/* ===================================================
+            CONTENT
+        ==================================================== */}
+
+        <div className="flex-1 overflow-y-auto px-3 py-5">
+          {/* Section title */}
+
+          {!collapsed && (
+            <div className="mb-3 flex items-center gap-2 px-3">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-400 dark:text-slate-600">
+                Content
+              </span>
+
+              <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800" />
+            </div>
+          )}
+
+          {/* Content navigation */}
+
+          <div className="space-y-1">
+            <SidebarItems
+              text="All"
+              icon={<FiLayers />}
+              collapsed={collapsed}
+              active={selectedType === "All"}
+              onClick={() => handleTypeChange("All")}
+            />
+
+            <SidebarItems
+              text="Twitter / X"
+              icon={<FaXTwitter />}
+              collapsed={collapsed}
+              active={selectedType === "Twitter"}
+              onClick={() => handleTypeChange("Twitter")}
+            />
+
+            <SidebarItems
+              text="YouTube"
+              icon={<FiYoutube />}
+              collapsed={collapsed}
+              active={selectedType === "Youtube"}
+              onClick={() => handleTypeChange("Youtube")}
+            />
+
+            <SidebarItems
+              text="Website"
+              icon={<FiGlobe />}
+              collapsed={collapsed}
+              active={selectedType === "Website"}
+              onClick={() => handleTypeChange("Website")}
+            />
+          </div>
+
+          {/* =================================================
+              TAGS
+          ================================================== */}
+
+          {tags.length > 0 && (
+            <div className="mt-7">
+              {!collapsed && (
+                <div className="mb-3 flex items-center gap-2 px-3">
+                  <FiTag className="h-3 w-3 text-slate-400" />
+
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-400 dark:text-slate-600">
+                    Tags
+                  </span>
+
+                  <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800" />
+                </div>
+              )}
+
+              {/* All */}
+
+              <motion.button
+                type="button"
+                whileTap={{ scale: 0.96 }}
+                onClick={() => handleTagChange("")}
+                title={collapsed ? "All tags" : undefined}
+                className={`
+                  mb-2
+                  flex
+                  items-center
+                  justify-center
+                  rounded-lg
+                  text-xs
+                  font-medium
+                  transition-colors
+
+                  ${
+                    collapsed
+                      ? "mx-auto h-9 w-9"
+                      : "w-full px-3 py-2"
+                  }
+
+                  ${
+                    selectedTag === ""
+                      ? `
+                        bg-slate-900
+                        text-white
+
+                        dark:bg-white
+                        dark:text-slate-900
+                      `
+                      : `
+                        bg-slate-100
+                        text-slate-600
+                        hover:bg-slate-200
+
+                        dark:bg-slate-800
+                        dark:text-slate-300
+                        dark:hover:bg-slate-700
+                      `
+                  }
+                `}
+              >
+                {collapsed ? (
+                  <FiTag className="h-4 w-4" />
+                ) : (
+                  "All Tags"
+                )}
+              </motion.button>
+
+              {!collapsed && (
+                <div className="flex flex-wrap gap-1.5 px-1">
+                  {tags.map((tag) => (
+                    <motion.button
+                      key={tag}
+                      type="button"
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleTagChange(tag)}
+                      className={`
+                        rounded-lg
+                        px-2.5
+                        py-1.5
+                        text-[11px]
+                        font-medium
+                        transition-colors
+
+                        ${
+                          selectedTag === tag
+                            ? `
+                              bg-slate-900
+                              text-white
+
+                              dark:bg-white
+                              dark:text-slate-900
+                            `
+                            : `
+                              bg-slate-100
+                              text-slate-500
+                              hover:bg-slate-200
+                              hover:text-slate-800
+
+                              dark:bg-slate-800
+                              dark:text-slate-400
+                              dark:hover:bg-slate-700
+                              dark:hover:text-slate-200
+                            `
+                        }
+                      `}
+                    >
+                      #{tag}
+                    </motion.button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* ===================================================
+            FOOTER
+        ==================================================== */}
+
+        <div
+          className="
+            shrink-0
+            border-t
+            border-slate-100
+            p-3
+
+            dark:border-slate-800
+          "
+        >
+          {/* Appearance */}
+
+          <div
+            className={`
+              mb-2
+              flex
+              items-center
+
+              ${
+                collapsed
+                  ? "justify-center"
+                  : "justify-between px-2"
+              }
+            `}
+            title="Appearance"
+          >
+            {!collapsed && (
+              <span className="text-xs font-medium text-slate-400 dark:text-slate-500">
+                Appearance
+              </span>
+            )}
+
             <ThemeToggle />
           </div>
-        )}
-      </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto px-3 py-5">
-        {!collapsed && (
-          <p className="mb-4 px-3 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-            Content
-          </p>
-        )}
+          {/* Login / Logout */}
 
-        <div className="space-y-2">
-          <SidebarItems
-            text="All"
-            icon="📚"
-            collapsed={collapsed}
-            active={selectedType === "All"}
-            onClick={() => onTypeChange("All")}
-          />
+          {isLoggedIn ? (
+            <motion.button
+              type="button"
+              whileHover={{
+                y: -1,
+              }}
+              whileTap={{
+                scale: 0.97,
+              }}
+              onClick={handleLogout}
+              title={collapsed ? "Logout" : undefined}
+              className={`
+                flex
+                items-center
+                justify-center
+                gap-2
+                rounded-xl
+                bg-slate-900
+                text-white
+                transition-colors
 
-          <SidebarItems
-            text="Twitter / X"
-            icon={<XIcon />}
-            collapsed={collapsed}
-            active={selectedType === "Twitter"}
-            onClick={() => onTypeChange("Twitter")}
-          />
+                hover:bg-slate-800
 
-          <SidebarItems
-            text="Youtube"
-            icon={<YoutubeIcons />}
-            collapsed={collapsed}
-            active={selectedType === "Youtube"}
-            onClick={() => onTypeChange("Youtube")}
-          />
+                dark:bg-white
+                dark:text-slate-900
+                dark:hover:bg-slate-200
 
-          <SidebarItems
-            text="Website"
-            icon="🌐"
-            collapsed={collapsed}
-            active={selectedType === "Website"}
-            onClick={() => onTypeChange("Website")}
-          />
-        </div>
-
-        {/* Tags */}
-        {tags.length > 0 && (
-          <div className="mt-8">
-            {!collapsed && (
-              <p className="mb-4 px-3 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                Tags
-              </p>
-            )}
-
-            <div
-              className={`flex gap-2 ${
-                collapsed ? "flex-col items-center" : "flex-wrap px-2"
-              }`}
+                ${
+                  collapsed
+                    ? "mx-auto h-11 w-11"
+                    : "w-full px-4 py-2.5"
+                }
+              `}
             >
-              {/* All Tags */}
-              <button
-                onClick={() => onTagChange("")}
-                className={`rounded-full px-3 py-1 text-xs font-medium transition ${
-                  selectedTag === ""
-                    ? "bg-indigo-600 text-white"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
-                }`}
-              >
-                {collapsed ? "🏷️" : "All"}
-              </button>
+              <FiLogOut className="h-4 w-4" />
 
-              {!collapsed &&
-                tags.map((tag) => (
-                  <button
-                    key={tag}
-                    onClick={() => onTagChange(tag)}
-                    className={`rounded-full px-3 py-1 text-xs font-medium transition ${
-                      selectedTag === tag
-                        ? "bg-indigo-600 text-white"
-                        : "bg-indigo-50 text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-300 dark:hover:bg-indigo-900/50"
-                    }`}
-                  >
-                    #{tag}
-                  </button>
-                ))}
-            </div>
-          </div>
-        )}
-      </div>
+              {!collapsed && (
+                <span className="text-sm font-medium">
+                  Logout
+                </span>
+              )}
+            </motion.button>
+          ) : (
+            <motion.button
+              type="button"
+              whileHover={{
+                y: -1,
+              }}
+              whileTap={{
+                scale: 0.97,
+              }}
+              onClick={handleLogin}
+              title={collapsed ? "Login" : undefined}
+              className={`
+                flex
+                items-center
+                justify-center
+                gap-2
+                rounded-xl
+                bg-slate-900
+                text-white
+                transition-colors
 
-      {/* Footer */}
-      <div className="border-t border-slate-100 p-4 dark:border-slate-700">
-        {isLoggedIn ? (
-          <button
-            onClick={handleLogout}
-            className={`flex items-center justify-center gap-2 rounded-2xl bg-red-500 text-white transition hover:bg-red-600 ${
-              collapsed ? "mx-auto h-14 w-14 rounded-xl" : "w-full px-4 py-3"
-            }`}
-          >
-            <LogoutIcon />
+                hover:bg-slate-800
 
-            {!collapsed && <span className="font-medium">Logout</span>}
-          </button>
-        ) : (
-          <button
-            onClick={handleLogin}
-            className={`flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 text-white transition hover:bg-indigo-700 ${
-              collapsed ? "mx-auto h-14 w-14 rounded-xl" : "w-full px-4 py-3"
-            }`}
-          >
-            <span className="text-lg">🔐</span>
+                dark:bg-white
+                dark:text-slate-900
+                dark:hover:bg-slate-200
 
-            {!collapsed && <span className="font-medium">Login</span>}
-          </button>
-        )}
-      </div>
-    </aside>
+                ${
+                  collapsed
+                    ? "mx-auto h-11 w-11"
+                    : "w-full px-4 py-2.5"
+                }
+              `}
+            >
+              <FiLogIn className="h-4 w-4" />
+
+              {!collapsed && (
+                <span className="text-sm font-medium">
+                  Login
+                </span>
+              )}
+            </motion.button>
+          )}
+        </div>
+      </motion.aside>
+    </>
   );
 }

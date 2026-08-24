@@ -1,6 +1,14 @@
-import { Button } from "../Button";
+import { motion } from "framer-motion";
 
+import { Button } from "../Button";
 import PlusIcon from "../../icons/PlusIcon";
+import BrainIcon from "../../icons/BrainIcon";
+
+import {
+  fadeUp,
+  scaleFade,
+  staggerContainer,
+} from "../../animations";
 
 interface EmptyStateProps {
   onAdd: () => void;
@@ -8,33 +16,190 @@ interface EmptyStateProps {
 
 export default function EmptyState({ onAdd }: EmptyStateProps) {
   return (
-    <div className="flex min-h-[420px] items-center justify-center">
-      <div className="w-full max-w-2xl rounded-[36px] border border-dashed border-slate-300 bg-white px-8 py-16 text-center shadow-sm transition-colors dark:border-slate-700 dark:bg-slate-800">
-        {/* Icon */}
-        <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-[28px] bg-gradient-to-br from-indigo-100 to-purple-100 text-5xl shadow-sm dark:from-slate-700 dark:to-slate-600">
-          🧠
-        </div>
+    <motion.section
+      variants={scaleFade}
+      initial="hidden"
+      animate="visible"
+      className="
+        flex
+        w-full
+        items-center
+        justify-center
+        py-8
+        sm:py-12
+        lg:py-16
+      "
+    >
+      <motion.div
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+        className="
+          relative
+          w-full
+          max-w-2xl
+          overflow-hidden
+          rounded-3xl
+          border
+          border-dashed
+          border-slate-300
+          bg-white
+          px-5
+          py-10
+          text-center
+          shadow-sm
 
-        {/* Heading */}
-        <h2 className="mt-8 text-3xl font-bold tracking-tight text-slate-800 dark:text-white">
-          Your brain is empty
-        </h2>
+          sm:rounded-[32px]
+          sm:px-8
+          sm:py-14
 
-        <p className="mx-auto mt-3 max-w-md text-slate-500 dark:text-slate-300">
-          Start saving videos, tweets, websites, and resources to build your
-          second brain.
-        </p>
+          dark:border-slate-700
+          dark:bg-slate-800/70
+        "
+      >
+        {/* Background glow */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.7 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{
+            duration: 0.7,
+            ease: "easeOut",
+          }}
+          className="
+            pointer-events-none
+            absolute
+            left-1/2
+            top-0
+            h-40
+            w-40
+            -translate-x-1/2
+            -translate-y-1/2
+            rounded-full
+            bg-indigo-500/10
+            blur-3xl
+          "
+        />
+
+        {/* Brain icon */}
+        <motion.div
+          variants={fadeUp}
+          whileHover={{
+            y: -4,
+            scale: 1.04,
+          }}
+          transition={{
+            duration: 0.2,
+            ease: "easeOut",
+          }}
+          className="
+            relative
+            mx-auto
+            flex
+            h-20
+            w-20
+            items-center
+            justify-center
+            rounded-[24px]
+            bg-gradient-to-br
+            from-indigo-600
+            to-purple-600
+            shadow-lg
+            shadow-indigo-500/20
+
+            sm:h-24
+            sm:w-24
+            sm:rounded-[28px]
+          "
+        >
+          <div
+            className="
+              flex
+              h-14
+              w-14
+              items-center
+              justify-center
+              rounded-2xl
+              bg-white/10
+              backdrop-blur-sm
+
+              sm:h-16
+              sm:w-16
+            "
+          >
+            <BrainIcon />
+          </div>
+        </motion.div>
+
+        {/* Text */}
+        <motion.div
+          variants={fadeUp}
+          className="relative mt-6 sm:mt-7"
+        >
+          <h2
+            className="
+              text-2xl
+              font-bold
+              tracking-tight
+              text-slate-800
+              sm:text-3xl
+              dark:text-white
+            "
+          >
+            Your brain is empty
+          </h2>
+
+          <p
+            className="
+              mx-auto
+              mt-3
+              max-w-md
+              text-sm
+              leading-6
+              text-slate-500
+              sm:text-base
+              dark:text-slate-300
+            "
+          >
+            Start saving videos, tweets, websites, and resources
+            to build your second brain.
+          </p>
+        </motion.div>
 
         {/* CTA */}
-        <div className="mt-8 flex justify-center">
+        <motion.div
+          variants={fadeUp}
+          className="
+            relative
+            mt-7
+            flex
+            justify-center
+            sm:mt-8
+          "
+          whileHover={{ y: -2 }}
+          whileTap={{ scale: 0.97 }}
+        >
           <Button
             onClick={onAdd}
             variant="primary"
             text="Add Content"
             startIcon={<PlusIcon />}
           />
-        </div>
-      </div>
-    </div>
+        </motion.div>
+
+        {/* Hint */}
+        <motion.p
+          variants={fadeUp}
+          className="
+            relative
+            mt-4
+            text-xs
+            text-slate-400
+            dark:text-slate-500
+          "
+        >
+          Save something useful for later.
+        </motion.p>
+      </motion.div>
+    </motion.section>
   );
 }

@@ -19,6 +19,12 @@ import {
   scaleFade,
 } from "../animations";
 
+const meetsPasswordRequirements = (value: string) =>
+  value.length >= 8 &&
+  /[A-Z]/.test(value) &&
+  /\d/.test(value) &&
+  /[^A-Za-z0-9]/.test(value);
+
 export default function Signup() {
   const nameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
@@ -68,7 +74,7 @@ export default function Signup() {
       return false;
     }
 
-    if (!passwordRules.every((rule) => rule.valid)) {
+    if (!meetsPasswordRequirements(password)) {
       toast.error("Please meet all password requirements");
       return false;
     }
@@ -326,7 +332,7 @@ export default function Signup() {
             }
             fullWidth
             loading={loading}
-            disabled={!passwordRules.every((rule) => rule.valid)}
+            disabled={!meetsPasswordRequirements(password)}
           />
         </motion.div>
 

@@ -213,6 +213,10 @@ export default function Card({
         group
         relative
         overflow-visible
+        flex
+        h-full
+        min-h-[410px]
+        flex-col
         rounded-[26px]
 
         border
@@ -246,6 +250,8 @@ export default function Card({
           transition={{ duration: 0.4 }}
           className="
             relative
+            h-56
+            shrink-0
             overflow-hidden
             rounded-t-[26px]
             bg-black
@@ -254,7 +260,7 @@ export default function Card({
           {embedUrl ? (
             <iframe
               className="
-                aspect-video
+                h-full
                 w-full
                 border-0
               "
@@ -292,7 +298,8 @@ export default function Card({
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4 }}
           className="
-            h-[260px]
+            h-56
+            shrink-0
             overflow-hidden
             rounded-t-[26px]
             bg-slate-100
@@ -320,7 +327,8 @@ export default function Card({
           className="
             relative
             flex
-            h-[230px]
+            h-56
+            shrink-0
             flex-col
             justify-between
             overflow-hidden
@@ -450,7 +458,7 @@ export default function Card({
           CONTENT
       ===================================== */}
 
-      <div className="p-5 sm:p-6">
+      <div className="flex flex-1 flex-col p-5 sm:p-6">
         <div className="flex items-start gap-4">
           {/* Main */}
           <div className="min-w-0 flex-1">
@@ -491,6 +499,8 @@ export default function Card({
               variants={fadeUp}
               className="
                 line-clamp-2
+                h-[3.5rem]
+                overflow-hidden
                 text-lg
                 font-semibold
                 leading-snug
@@ -507,11 +517,12 @@ export default function Card({
             </motion.h2>
 
             {/* Tags */}
-            {tags.length > 0 && (
-              <motion.div
-                variants={fadeUp}
-                className="mt-4 flex flex-wrap gap-1.5"
-              >
+            <motion.div
+              variants={fadeUp}
+              className="mt-3 flex h-[52px] flex-wrap content-start gap-1.5 overflow-hidden"
+            >
+              {tags.length > 0 && (
+                <>
                 {tags.slice(0, 4).map((tag) => (
                   <span
                     key={tag}
@@ -554,8 +565,9 @@ export default function Card({
                     +{tags.length - 4}
                   </span>
                 )}
-              </motion.div>
-            )}
+                </>
+              )}
+            </motion.div>
           </div>
 
           {/* =====================================
@@ -804,7 +816,8 @@ function PreviewFallback({
       animate={{ opacity: 1 }}
       className="
         flex
-        h-[230px]
+        h-56
+        shrink-0
         flex-col
         items-center
         justify-center

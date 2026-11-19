@@ -21,7 +21,7 @@ export default function SidebarItems({
       type="button"
       onClick={onClick}
       title={collapsed ? text : undefined}
-      aria-current={active ? "page" : undefined}
+      aria-pressed={active}
       whileHover={{ x: collapsed ? 0 : 2 }}
       whileTap={{ scale: 0.98 }}
       transition={{ duration: 0.15 }}
@@ -45,11 +45,11 @@ export default function SidebarItems({
         ${
           active
             ? `
-              bg-slate-100
-              text-slate-900
+              bg-indigo-50
+              text-indigo-700
 
-              dark:bg-slate-800
-              dark:text-white
+              dark:bg-indigo-500/10
+              dark:text-indigo-200
             `
             : `
               text-slate-500
@@ -84,9 +84,9 @@ export default function SidebarItems({
             w-[3px]
             -translate-y-1/2
             rounded-r-full
-            bg-slate-900
+            bg-indigo-600
 
-            dark:bg-white
+            dark:bg-indigo-400
           "
         />
       )}
@@ -119,12 +119,12 @@ export default function SidebarItems({
           ${
             active
               ? `
-                bg-white
-                text-slate-900
+                bg-indigo-100
+                text-indigo-700
                 shadow-sm
 
-                dark:bg-slate-700
-                dark:text-white
+                dark:bg-indigo-500/20
+                dark:text-indigo-200
               `
               : `
                 text-slate-500

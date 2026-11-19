@@ -173,7 +173,7 @@ export function Sidebar({
       <motion.aside
         initial={false}
         animate={{
-          width: collapsed ? 88 : 288,
+          width: mobileOpen ? "min(86vw, 320px)" : collapsed ? 88 : 288,
         }}
         transition={{
           duration: 0.3,
@@ -189,13 +189,14 @@ export function Sidebar({
           flex-col
 
           border-r
-          border-slate-200
-          bg-white
+          border-slate-200/80
+          bg-white/95
+          backdrop-blur-xl
 
           shadow-[4px_0_24px_rgba(0,0,0,0.04)]
 
-          dark:border-slate-800
-          dark:bg-slate-950
+          dark:border-white/[0.08]
+          dark:bg-[#0b0d15]/95
 
           /* Mobile */
           w-[min(86vw,320px)]
@@ -220,7 +221,7 @@ export function Sidebar({
             relative
             shrink-0
             border-b
-            border-slate-100
+            border-slate-100/80
             px-4
             py-4
 
@@ -251,13 +252,17 @@ export function Sidebar({
                 shrink-0
                 items-center
                 justify-center
-                rounded-xl
-                bg-slate-900
+                rounded-2xl
+                bg-gradient-to-br
+                from-indigo-500
+                to-violet-600
                 text-white
                 shadow-sm
 
-                dark:bg-white
-                dark:text-slate-900
+                dark:bg-gradient-to-br
+                dark:from-indigo-500
+                dark:to-violet-600
+                dark:text-white
               "
             >
               <BrainIcon />
@@ -383,13 +388,13 @@ export function Sidebar({
             CONTENT
         ==================================================== */}
 
-        <div className="flex-1 overflow-y-auto px-3 py-5">
+          <div className="flex-1 overflow-y-auto px-3 py-5">
           {/* Section title */}
 
           {!collapsed && (
             <div className="mb-3 flex items-center gap-2 px-3">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-400 dark:text-slate-600">
-                Content
+              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
+                Library
               </span>
 
               <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800" />
@@ -437,12 +442,12 @@ export function Sidebar({
           ================================================== */}
 
           {tags.length > 0 && (
-            <div className="mt-7">
+            <div className="mt-7 border-t border-slate-100/80 pt-5 dark:border-white/[0.07]">
               {!collapsed && (
                 <div className="mb-3 flex items-center gap-2 px-3">
                   <FiTag className="h-3 w-3 text-slate-400" />
 
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-400 dark:text-slate-600">
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
                     Tags
                   </span>
 
@@ -457,12 +462,13 @@ export function Sidebar({
                 whileTap={{ scale: 0.96 }}
                 onClick={() => handleTagChange("")}
                 title={collapsed ? "All tags" : undefined}
+                aria-pressed={selectedTag === ""}
                 className={`
                   mb-2
                   flex
                   items-center
                   justify-center
-                  rounded-lg
+                  rounded-xl
                   text-xs
                   font-medium
                   transition-colors
@@ -476,11 +482,10 @@ export function Sidebar({
                   ${
                     selectedTag === ""
                       ? `
-                        bg-slate-900
+                        bg-indigo-600
                         text-white
-
-                        dark:bg-white
-                        dark:text-slate-900
+                        shadow-sm shadow-indigo-600/20
+                        dark:bg-indigo-500
                       `
                       : `
                         bg-slate-100
@@ -501,7 +506,24 @@ export function Sidebar({
                 )}
               </motion.button>
 
-              {!collapsed && (
+              {collapsed ? (
+                <div className="flex flex-col items-center gap-1.5">
+                  {tags.map((tag) => (
+                    <motion.button
+                      key={tag}
+                      type="button"
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleTagChange(tag)}
+                      title={tag}
+                      aria-label={`Filter by ${tag}`}
+                      aria-pressed={selectedTag === tag}
+                      className={`flex h-9 w-9 items-center justify-center rounded-xl text-xs font-semibold transition-colors ${selectedTag === tag ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-500 hover:bg-indigo-50 hover:text-indigo-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-indigo-500/10 dark:hover:text-indigo-200"}`}
+                    >
+                      {tag.slice(0, 1).toUpperCase()}
+                    </motion.button>
+                  ))}
+                </div>
+              ) : (
                 <div className="flex flex-wrap gap-1.5 px-1">
                   {tags.map((tag) => (
                     <motion.button
@@ -509,8 +531,9 @@ export function Sidebar({
                       type="button"
                       whileTap={{ scale: 0.95 }}
                       onClick={() => handleTagChange(tag)}
+                      aria-pressed={selectedTag === tag}
                       className={`
-                        rounded-lg
+                        rounded-xl
                         px-2.5
                         py-1.5
                         text-[11px]
@@ -520,11 +543,9 @@ export function Sidebar({
                         ${
                           selectedTag === tag
                             ? `
-                              bg-slate-900
+                              bg-indigo-600
                               text-white
-
-                              dark:bg-white
-                              dark:text-slate-900
+                              shadow-sm shadow-indigo-600/20
                             `
                             : `
                               bg-slate-100
@@ -532,10 +553,10 @@ export function Sidebar({
                               hover:bg-slate-200
                               hover:text-slate-800
 
-                              dark:bg-slate-800
-                              dark:text-slate-400
+                              dark:bg-slate-800/80
+                              dark:text-slate-300
                               dark:hover:bg-slate-700
-                              dark:hover:text-slate-200
+                              dark:hover:text-white
                             `
                         }
                       `}
@@ -557,10 +578,12 @@ export function Sidebar({
           className="
             shrink-0
             border-t
-            border-slate-100
+            border-slate-100/80
+            bg-slate-50/60
             p-3
 
-            dark:border-slate-800
+            dark:border-white/[0.08]
+            dark:bg-white/[0.02]
           "
         >
           {/* Appearance */}

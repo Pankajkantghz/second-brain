@@ -5,6 +5,7 @@ import { AuthRequest } from "../types/auth.types";
 import { signupUser, signinUser } from "../services/auth.service";
 
 import { signupSchema, signinSchema } from "../validators/auth.validation";
+import { z } from "zod";
 
 /* Signup */
 export const signup = async (req: AuthRequest, res: Response) => {
@@ -18,11 +19,22 @@ export const signup = async (req: AuthRequest, res: Response) => {
     );
 
     return res.status(201).json(result);
-  } catch (error: any) {
-    return res.status(400).json({
-      message:
-        error?.issues?.[0]?.message || error.message || "Signup failed",
-    });
+  } catch (error: unknown) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        message: error.issues[0]?.message || "Invalid signup details",
+      });
+    }
+
+    if (
+      (error instanceof Error && error.message === "User already exists") ||
+      (typeof error === "object" && error !== null && "code" in error && error.code === 11000)
+    ) {
+      return res.status(409).json({ message: "Email already exists" });
+    }
+
+    console.error("Signup failed:", error);
+    return res.status(500).json({ message: "Signup failed" });
   }
 };
 
@@ -34,10 +46,19 @@ export const signin = async (req: AuthRequest, res: Response) => {
     const result = await signinUser(validated.email, validated.password);
 
     return res.json(result);
-  } catch (error: any) {
-    return res.status(400).json({
-      message: error.message || "Signin failed",
-    });
+  } catch (error: unknown) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        message: error.issues[0]?.message || "Invalid signin details",
+      });
+    }
+
+    if (error instanceof Error && error.message === "Invalid credentials") {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    console.error("Signin failed:", error);
+    return res.status(500).json({ message: "Signin failed" });
   }
 };
 

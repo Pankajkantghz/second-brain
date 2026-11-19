@@ -80,9 +80,13 @@ Create a `.env` file:
 
 ```env
 MONGO_URI=your_mongodb_connection_string
-JWT_PASSWORD=your_secret_key
+JWT_PASSWORD=use_a_long_random_secret_value_at_least_32_characters
+FRONTEND_URL=http://localhost:5173
 PORT=3000
 ```
+
+`JWT_PASSWORD` is required to start the API. Set `FRONTEND_URL` to the deployed
+frontend origin in production (for example, your Vercel URL).
 
 ## API Endpoints
 

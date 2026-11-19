@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -35,6 +34,7 @@ interface SidebarProps {
 
   // Mobile sidebar
   mobileOpen: boolean;
+  onMobileOpen: () => void;
   onMobileClose: () => void;
 }
 
@@ -46,10 +46,11 @@ export function Sidebar({
   onTagChange,
   collapsed,
   onToggleCollapse,
+  mobileOpen,
+  onMobileOpen,
+  onMobileClose,
 }: SidebarProps) {
   const navigate = useNavigate();
-
-  const [mobileOpen, setMobileOpen] = useState(false);
 
   const isLoggedIn = !!localStorage.getItem("token");
 
@@ -62,7 +63,7 @@ export function Sidebar({
 
     toast.success("Logged out");
 
-    setMobileOpen(false);
+    onMobileClose();
 
     navigate("/signin");
   };
@@ -72,7 +73,7 @@ export function Sidebar({
   ------------------------------------------------------- */
 
   const handleLogin = () => {
-    setMobileOpen(false);
+    onMobileClose();
 
     navigate("/signin");
   };
@@ -83,7 +84,7 @@ export function Sidebar({
 
   const handleTypeChange = (type: string) => {
     onTypeChange(type);
-    setMobileOpen(false);
+    onMobileClose();
   };
 
   /* -------------------------------------------------------
@@ -92,7 +93,7 @@ export function Sidebar({
 
   const handleTagChange = (tag: string) => {
     onTagChange(tag);
-    setMobileOpen(false);
+    onMobileClose();
   };
 
   return (
@@ -110,7 +111,7 @@ export function Sidebar({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.85 }}
             whileTap={{ scale: 0.92 }}
-            onClick={() => setMobileOpen(true)}
+            onClick={onMobileOpen}
             className="
               fixed
               left-4
@@ -151,7 +152,7 @@ export function Sidebar({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setMobileOpen(false)}
+            onClick={onMobileClose}
             className="
               fixed
               inset-0
@@ -302,7 +303,7 @@ export function Sidebar({
               type="button"
               aria-label="Close sidebar"
               whileTap={{ scale: 0.9 }}
-              onClick={() => setMobileOpen(false)}
+              onClick={onMobileClose}
               className="
                 ml-auto
                 flex

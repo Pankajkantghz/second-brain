@@ -17,6 +17,14 @@ import { FiYoutube } from "react-icons/fi";
 
 import { fadeUp } from "../animations";
 
+interface TwitterWindow extends Window {
+  twttr?: {
+    widgets?: {
+      load: () => void;
+    };
+  };
+}
+
 interface CardProps {
   title: string;
   link: string;
@@ -94,8 +102,8 @@ export default function Card({
       script.async = true;
 
       document.body.appendChild(script);
-    } else if ((window as any).twttr?.widgets) {
-      (window as any).twttr.widgets.load();
+    } else if ((window as TwitterWindow).twttr?.widgets) {
+      (window as TwitterWindow).twttr?.widgets?.load();
     }
   }, [normalizedType, link]);
 
@@ -155,8 +163,8 @@ export default function Card({
 
         toast.success("Link copied");
       }
-    } catch (error: any) {
-      if (error?.name !== "AbortError") {
+    } catch (error: unknown) {
+      if (!(error instanceof DOMException && error.name === "AbortError")) {
         try {
           await navigator.clipboard.writeText(link);
 

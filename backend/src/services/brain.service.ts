@@ -13,7 +13,7 @@ export const createShareLink = async (userId: string) => {
     };
   }
 
-  const hash = random(10);
+  const hash = random(32);
 
   await LinkModel.create({
     userId,
@@ -52,8 +52,6 @@ export const fetchSharedBrain = async (shareLink: string) => {
 
   return {
     name: user.name,
-
-    email: user.email,
 
     content,
   };

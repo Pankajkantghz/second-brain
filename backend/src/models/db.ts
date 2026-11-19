@@ -2,14 +2,16 @@ import mongoose, { model, Schema } from "mongoose";
 
 /* ---------------- Database Connection ---------------- */
 
-mongoose
-  .connect(process.env.MONGO_URI || "")
-  .then(() => {
-    console.log("MongoDB connected");
-  })
-  .catch((error) => {
-    console.log("MongoDB connection error:", error);
-  });
+export const connectToDatabase = async () => {
+  const mongoUri = process.env.MONGO_URI;
+
+  if (!mongoUri) {
+    throw new Error("MONGO_URI must be configured in the environment");
+  }
+
+  await mongoose.connect(mongoUri);
+  console.log("MongoDB connected");
+};
 
 /* ---------------- User Schema ---------------- */
 

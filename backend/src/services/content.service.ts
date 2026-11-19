@@ -31,22 +31,23 @@ export const addContent = async ({
 /* ---------------- Get Content ---------------- */
 
 export const getContent = async (userId: string, search?: string) => {
-  const query: any = {
+  const query: Record<string, unknown> = {
     userId,
   };
 
   if (search && search.trim()) {
+    const escapedSearch = search.trim().slice(0, 100).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     query.$or = [
       {
         title: {
-          $regex: search,
+          $regex: escapedSearch,
           $options: "i",
         },
       },
 
       {
         tags: {
-          $regex: search,
+          $regex: escapedSearch,
           $options: "i",
         },
       },
@@ -68,14 +69,6 @@ export const deleteContent = async (contentId: string, userId: string) => {
 };
 
 /* ---------------- Update Content ---------------- */
-
-interface UpdateContentParams {
-  contentId: string;
-  title: string;
-  link: string;
-  tags: string[];
-  userId: string;
-}
 
 export const updateContent = async ({
   contentId,

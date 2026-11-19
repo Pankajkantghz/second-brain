@@ -1,10 +1,25 @@
 export function detectType(url: string) {
-  if (url.includes("youtube.com") || url.includes("youtu.be")) {
-    return "Youtube";
-  }
+  try {
+    const hostname = new URL(url).hostname.toLowerCase();
 
-  if (url.includes("twitter.com") || url.includes("x.com")) {
-    return "Twitter";
+    if (
+      hostname === "youtu.be" ||
+      hostname === "youtube.com" ||
+      hostname.endsWith(".youtube.com")
+    ) {
+      return "Youtube";
+    }
+
+    if (
+      hostname === "twitter.com" ||
+      hostname.endsWith(".twitter.com") ||
+      hostname === "x.com" ||
+      hostname.endsWith(".x.com")
+    ) {
+      return "Twitter";
+    }
+  } catch {
+    // URL validation is handled before this function is called.
   }
 
   return "Website";

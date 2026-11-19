@@ -11,6 +11,7 @@ import {
 
 import {
   createContentSchema,
+  deleteContentSchema,
   updateContentSchema,
 } from "../validators/content.validator";
 
@@ -81,7 +82,8 @@ export const getContentController = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    const search = req.query.search as string;
+    const search =
+      typeof req.query.search === "string" ? req.query.search : undefined;
 
     const content = await getContent(userId, search);
 
@@ -118,9 +120,21 @@ export const deleteContentController = async (
       });
     }
 
-    const { contentId } = req.body;
+    const validated = deleteContentSchema.safeParse(req.body);
 
-    await deleteContent(contentId, userId);
+    if (!validated.success) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid input",
+        errors: validated.error.flatten(),
+      });
+    }
+
+    const result = await deleteContent(validated.data.contentId, userId);
+
+    if (!result.deletedCount) {
+      return res.status(404).json({ success: false, message: "Content not found" });
+    }
 
     return res.json({
       success: true,
@@ -167,11 +181,15 @@ export const updateContentController = async (
 
     const { contentId, title } = validated.data;
 
-    await updateContent({
+    const result = await updateContent({
       contentId,
       title,
       userId,
     });
+
+    if (!result.matchedCount) {
+      return res.status(404).json({ success: false, message: "Content not found" });
+    }
 
     return res.json({
       success: true,

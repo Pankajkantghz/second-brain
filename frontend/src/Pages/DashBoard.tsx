@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { AnimatePresence, motion } from "framer-motion";
@@ -74,12 +74,8 @@ const DashBoard = () => {
 
   const contentResult = useContent();
 
-  const contents: ContentItem[] = contentResult?.contents ?? [];
+  const contents: ContentItem[] = contentResult.contents;
   const refresh = contentResult?.refresh;
-
-  useEffect(() => {
-    refresh?.();
-  }, [refresh]);
 
   /* =====================================================
      STATS
@@ -267,6 +263,7 @@ const DashBoard = () => {
         collapsed={sidebarCollapsed}
         onToggleCollapse={() => setSidebarCollapsed((prev) => !prev)}
         mobileOpen={mobileSidebarOpen}
+        onMobileOpen={() => setMobileSidebarOpen(true)}
         onMobileClose={handleMobileClose}
       />
 

@@ -10,6 +10,7 @@ import hpp from "hpp";
 import authRoutes from "./routes/auth.routes";
 import contentRoutes from "./routes/content.routes";
 import brainRoutes from "./routes/brain.routes";
+import { connectToDatabase } from "./models/db";
 
 const app = express();
 
@@ -62,7 +63,7 @@ app.use(
 /* Secure CORS */
 app.use(
   cors({
-    origin: "https://second-brain-rust-seven.vercel.app",
+    origin: process.env.FRONTEND_URL || "https://second-brain-rust-seven.vercel.app",
 
     methods: ["GET", "POST", "PUT", "DELETE"],
 
@@ -110,9 +111,17 @@ app.use(
   },
 );
 
-/* Server */
-const PORT = process.env.PORT || 3000;
+/* Start serving only after the database is ready. */
+const startServer = async () => {
+  await connectToDatabase();
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+};
+
+startServer().catch((error: unknown) => {
+  console.error("Server startup failed:", error);
+  process.exit(1);
 });

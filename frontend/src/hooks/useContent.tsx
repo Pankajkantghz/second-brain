@@ -3,9 +3,10 @@ import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 
 import { Backend_URL } from "../config";
+import type { ContentItem } from "../types/content";
 
 export default function useContent() {
-  const [contents, setContents] = useState<any[]>([]);
+  const [contents, setContents] = useState<ContentItem[]>([]);
 
   const [loading, setLoading] = useState(false);
 
@@ -21,17 +22,10 @@ export default function useContent() {
         },
       });
 
-      console.log("Dashboard API:", response.data);
-
-      /* Handle every possible response shape */
-      const data = response.data;
-
-      const content =
-        data?.content || data?.contents || data?.data || data || [];
-
-      setContents(Array.isArray(content) ? content : []);
+      const content: unknown = response.data?.data;
+      setContents(Array.isArray(content) ? content as ContentItem[] : []);
     } catch (error) {
-      console.log(error);
+      console.error("Failed to fetch content:", error);
 
       setContents([]);
     } finally {

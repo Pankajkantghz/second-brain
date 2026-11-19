@@ -217,10 +217,6 @@ const DashBoard = () => {
      MOBILE SIDEBAR
   ===================================================== */
 
-  const handleMobileMenu = () => {
-    setMobileSidebarOpen(true);
-  };
-
   const handleMobileClose = () => {
     setMobileSidebarOpen(false);
   };
@@ -245,9 +241,9 @@ const DashBoard = () => {
       animate="visible"
       className="
         min-h-screen
-        bg-slate-100
+        bg-slate-50
         transition-colors
-        dark:bg-slate-950
+        dark:bg-[#090b12]
       "
     >
       {/* =================================================
@@ -309,6 +305,8 @@ const DashBoard = () => {
       <main
         className={`
           min-h-screen
+          relative
+          overflow-hidden
           px-4
           py-5
           transition-[margin]
@@ -318,8 +316,11 @@ const DashBoard = () => {
           sm:py-6
 
           ${sidebarCollapsed ? "md:ml-24" : "md:ml-72"}
+          dark:text-slate-100
         `}
       >
+        <div className="pointer-events-none absolute -right-40 -top-48 h-[34rem] w-[34rem] rounded-full bg-indigo-500/[0.07] blur-[120px] dark:bg-indigo-500/[0.09]" />
+        <div className="relative mx-auto max-w-[1600px]">
         {/* =================================================
             HEADER
         ================================================= */}
@@ -328,7 +329,6 @@ const DashBoard = () => {
           <DashboardHeader
             onAdd={() => setModalOpen(true)}
             onShare={handleShare}
-            onMenu={handleMobileMenu}
           />
         </motion.div>
 
@@ -348,6 +348,7 @@ const DashBoard = () => {
               youtubeCount={stats.youtube}
               twitterCount={stats.twitter}
               websiteCount={stats.website}
+              selectedType={selectedType}
               onSelect={setSelectedType}
             />
           </motion.div>
@@ -361,33 +362,18 @@ const DashBoard = () => {
           variants={fadeUp}
           initial="hidden"
           animate="visible"
-          className="mt-8"
+          className="mt-10"
         >
           {/* Section Header */}
 
-          <div className="mb-6">
+          <div className="mb-6 rounded-2xl border border-slate-200/80 bg-white/75 p-4 shadow-sm shadow-slate-900/[0.02] backdrop-blur sm:p-5 dark:border-white/[0.08] dark:bg-white/[0.035]">
             <div className="flex items-end justify-between gap-4">
               <div>
-                <h2
-                  className="
-                    text-2xl
-                    font-bold
-                    tracking-tight
-                    text-slate-900
-                    dark:text-white
-                  "
-                >
+                <h2 className="text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl dark:text-white">
                   Saved Content
                 </h2>
 
-                <p
-                  className="
-                    mt-1
-                    text-sm
-                    text-slate-500
-                    dark:text-slate-400
-                  "
-                >
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                   Your saved knowledge, links, and resources.
                 </p>
               </div>
@@ -411,14 +397,14 @@ const DashBoard = () => {
                 className="
                   hidden
                   rounded-full
-                  bg-slate-200
+                  border border-slate-200 bg-slate-100
                   px-3
                   py-1
                   text-xs
                   font-semibold
                   text-slate-600
                   sm:inline-flex
-                  dark:bg-slate-800
+                  dark:border-slate-700 dark:bg-slate-800
                   dark:text-slate-300
                 "
               >
@@ -565,6 +551,7 @@ const DashBoard = () => {
             )}
           </AnimatePresence>
         </motion.section>
+        </div>
       </main>
     </motion.div>
   );

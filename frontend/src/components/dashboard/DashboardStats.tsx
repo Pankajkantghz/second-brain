@@ -12,6 +12,7 @@ interface DashboardStatsProps {
   youtubeCount: number;
   twitterCount: number;
   websiteCount: number;
+  selectedType: string;
   onSelect: (type: string) => void;
 }
 
@@ -27,6 +28,7 @@ export default function DashboardStats({
   youtubeCount,
   twitterCount,
   websiteCount,
+  selectedType,
   onSelect,
 }: DashboardStatsProps) {
   const stats: Stat[] = [
@@ -63,7 +65,9 @@ export default function DashboardStats({
       animate="visible"
       className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4"
     >
-      {stats.map((stat) => (
+      {stats.map((stat) => {
+        const selected = selectedType === stat.type;
+        return (
         <motion.button
           key={stat.type}
           type="button"
@@ -79,14 +83,15 @@ export default function DashboardStats({
           whileTap={{
             scale: 0.98,
           }}
-          className="
+          aria-pressed={selected}
+          className={`
             group
             relative
             overflow-hidden
             rounded-2xl
             border
-            border-slate-200
-            bg-white
+            border-slate-200/80
+            bg-white/85
             p-4
             text-left
             shadow-sm
@@ -102,14 +107,13 @@ export default function DashboardStats({
             focus-visible:ring-indigo-500
             focus-visible:ring-offset-2
 
-            dark:border-slate-700
-            dark:bg-slate-800
+            ${selected ? "border-indigo-300 bg-indigo-50/80 shadow-md shadow-indigo-500/[0.08] dark:border-indigo-500/50 dark:bg-indigo-500/[0.09]" : "dark:border-white/[0.08] dark:bg-white/[0.035]"}
             dark:hover:border-indigo-500/50
             dark:focus-visible:ring-offset-slate-900
 
             md:rounded-3xl
             md:p-5
-          "
+          `}
         >
           {/* Background glow */}
           <div
@@ -135,13 +139,11 @@ export default function DashboardStats({
             <div className="min-w-0">
               <p
                 className="
-                  hidden
                   truncate
                   text-sm
                   font-medium
                   text-slate-500
                   dark:text-slate-400
-                  md:block
                 "
               >
                 {stat.title}
@@ -172,7 +174,7 @@ export default function DashboardStats({
                 duration: 0.2,
                 ease: "easeOut",
               }}
-              className="
+              className={`
                 flex
                 h-11
                 w-11
@@ -182,19 +184,14 @@ export default function DashboardStats({
                 rounded-xl
                 border
                 border-slate-200
-                bg-slate-100
+                ${selected ? "border-indigo-200 bg-indigo-100 text-indigo-700 dark:border-indigo-500/30 dark:bg-indigo-500/15 dark:text-indigo-200" : "bg-slate-100 text-slate-600 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300"}
                 text-lg
-                text-slate-600
                 transition-colors
                 duration-300
 
                 group-hover:border-indigo-200
                 group-hover:bg-indigo-50
                 group-hover:text-indigo-600
-
-                dark:border-slate-600
-                dark:bg-slate-700
-                dark:text-slate-300
 
                 dark:group-hover:border-indigo-500/40
                 dark:group-hover:bg-indigo-500/10
@@ -204,7 +201,7 @@ export default function DashboardStats({
                 md:w-12
                 md:rounded-2xl
                 md:text-xl
-              "
+              `}
             >
               {stat.icon}
             </motion.div>
@@ -229,7 +226,8 @@ export default function DashboardStats({
             "
           />
         </motion.button>
-      ))}
+        );
+      })}
     </motion.div>
   );
 }

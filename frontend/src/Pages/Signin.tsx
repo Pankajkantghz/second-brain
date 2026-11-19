@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { Eye, EyeOff, Brain } from "lucide-react";
 
 import ThemeToggle from "../components/ThemeToggle";
 import { Button } from "../components/Button";
@@ -16,6 +17,7 @@ export default function Signin() {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   /* Redirect if already logged in */
   useEffect(() => {
@@ -90,9 +92,12 @@ export default function Signin() {
       </div>
 
       {/* Card */}
-      <div className="w-full max-w-md rounded-[36px] border border-slate-100 bg-white p-8 shadow-[0_20px_60px_rgba(0,0,0,0.08)] transition-colors dark:border-slate-700 dark:bg-slate-800">
+      <div className="w-full max-w-lg rounded-[36px] border border-slate-100 bg-white p-7 shadow-[0_20px_60px_rgba(0,0,0,0.08)] transition-colors sm:p-10 dark:border-slate-700 dark:bg-slate-800">
         {/* Header */}
         <div className="mb-8 text-center">
+          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-300">
+            <Brain size={28} />
+          </div>
           <h1 className="text-4xl font-bold tracking-tight text-slate-800 dark:text-white">
             Welcome Back
           </h1>
@@ -124,13 +129,19 @@ export default function Signin() {
               Password
             </label>
 
-            <Input
-              ref={passwordRef}
-              type="password"
-              placeholder="Enter password"
-              autoComplete="current-password"
-              onKeyDown={handleKeyDown}
-            />
+            <div className="relative">
+              <Input
+                ref={passwordRef}
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter password"
+                autoComplete="current-password"
+                onKeyDown={handleKeyDown}
+                className="pr-12"
+              />
+              <button type="button" onClick={() => setShowPassword((shown) => !shown)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-400 hover:text-indigo-600">
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
         </div>
 

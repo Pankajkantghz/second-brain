@@ -7,6 +7,7 @@ interface ButtonsProps {
   onClick?: () => void;
   fullWidth?: boolean;
   loading?: boolean;
+  disabled?: boolean;
 }
 
 const variantClasses = {
@@ -27,16 +28,17 @@ export function Button({
   onClick,
   fullWidth,
   loading,
+  disabled,
 }: ButtonsProps) {
   return (
     <button
       onClick={onClick}
-      disabled={loading}
+      disabled={loading || disabled}
       className={`
         ${variantClasses[variant]}
         ${defaultStyles}
         ${fullWidth ? "w-full" : ""}
-        ${loading ? "opacity-70" : ""}
+        ${loading || disabled ? "opacity-70" : ""}
       `}
     >
       {loading ? (

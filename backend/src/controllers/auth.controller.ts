@@ -20,7 +20,8 @@ export const signup = async (req: AuthRequest, res: Response) => {
     return res.status(201).json(result);
   } catch (error: any) {
     return res.status(400).json({
-      message: error.message || "Signup failed",
+      message:
+        error?.issues?.[0]?.message || error.message || "Signup failed",
     });
   }
 };

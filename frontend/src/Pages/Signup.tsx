@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { Check, Eye, EyeOff, Brain } from "lucide-react";
 
 import { Link, useNavigate } from "react-router-dom";
 import ThemeToggle from "../components/ThemeToggle";
@@ -26,6 +27,14 @@ export default function Signup() {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const passwordRules = [
+    { label: "At least 8 characters", valid: password.length >= 8 },
+    { label: "One uppercase letter", valid: /[A-Z]/.test(password) },
+    { label: "One number", valid: /\d/.test(password) },
+    { label: "One symbol", valid: /[^A-Za-z0-9]/.test(password) },
+  ];
 
   /* Redirect if logged in */
   useEffect(() => {
@@ -59,8 +68,8 @@ export default function Signup() {
       return false;
     }
 
-    if (password.length < 6) {
-      toast.error("Password must be at least 6 characters");
+    if (!passwordRules.every((rule) => rule.valid)) {
+      toast.error("Please meet all password requirements");
       return false;
     }
 
@@ -166,12 +175,13 @@ export default function Signup() {
         variants={scaleFade}
         className="
           w-full
-          max-w-md
+          max-w-lg
           rounded-[36px]
           border
           border-slate-100
           bg-white
-          p-8
+          p-7
+          sm:p-10
           shadow-[0_20px_60px_rgba(0,0,0,0.08)]
           transition-colors
 
@@ -184,6 +194,9 @@ export default function Signup() {
           variants={fadeUp}
           className="mb-8 text-center"
         >
+          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-300">
+            <Brain size={28} />
+          </div>
           <h1
             className="
               text-4xl
@@ -271,12 +284,28 @@ export default function Signup() {
               Password
             </label>
 
-            <Input
-              ref={passwordRef}
-              type="password"
-              placeholder="Minimum 6 characters"
-              onKeyDown={handleKeyDown}
-            />
+            <div className="relative">
+              <Input
+                ref={passwordRef}
+                type={showPassword ? "text" : "password"}
+                placeholder="Create a strong password"
+                autoComplete="new-password"
+                onChange={(event) => setPassword(event.target.value)}
+                onKeyDown={handleKeyDown}
+                className="pr-12"
+              />
+              <button type="button" onClick={() => setShowPassword((shown) => !shown)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-400 hover:text-indigo-600">
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+            <div className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
+              {passwordRules.map((rule) => (
+                <div key={rule.label} className={`flex items-center gap-1.5 ${rule.valid ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400 dark:text-slate-500"}`}>
+                  <Check size={14} className={rule.valid ? "opacity-100" : "opacity-30"} />
+                  {rule.label}
+                </div>
+              ))}
+            </div>
           </motion.div>
         </motion.div>
 
@@ -297,6 +326,7 @@ export default function Signup() {
             }
             fullWidth
             loading={loading}
+            disabled={!passwordRules.every((rule) => rule.valid)}
           />
         </motion.div>
 
